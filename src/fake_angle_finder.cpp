@@ -20,7 +20,7 @@ void fake_bbox_angles() {
     private_nh_.param<double>("theta_large", theta_large, M_PI);
 
     ros::Publisher pub = nh.advertise<prop_follower::PropAngleRange>("prop_angle_range", 1);
-    ros::Rate rate(10);
+    ros::Rate rate(10); // 10 Hz
     prop_follower::PropAngleRange msg;
 
     // Message

@@ -15,12 +15,23 @@
 * 
 * Using the angle range and LiDAR scan, picks the closest point within the angle range.
 * The props are small enough that this point can be taken to represent the center of the prop. 
-* Converts this distance and angle to x and y coordinates
+* Converts this distance and angle to x and y distance relative to robot's current position
 *
 */
-class CoordFinder {
+class DistanceFinder {
 public:
-    CoordFinder() : nh_(""), private_nh_("~") {
+    /**
+    @brief Class constructor
+
+    Subscribers: 
+     - /prop_angle_range (angle range of identified object)
+     - /scan (LiDAR data)
+
+    Publishers:
+     - /prop_xy_dist
+
+    */
+    DistanceFinder() : nh_(""), private_nh_("~") {
         
         // get ROS parameters
         private_nh_.param<double>("angle_error_adjustment", angle_error_adjustment_, 0.0);
@@ -31,11 +42,11 @@ public:
 
         sub_scan_ = nh_.subscribe(scan_topic_, 1, &CoordFinder::scanCallback, this);
         sub_prop_ = nh_.subscribe(prop_topic_, 1, &CoordFinder::propCallback, this);
-        pub_prop_closest_ = nh_.advertise<geometry_msgs::Vector3>("/prop_local_coords", 1);
+        pub_prop_closest_ = nh_.advertise<geometry_msgs::Vector3>("/prop_xy_dist", 1);
     }
 
     void spin() {
-        ros::Rate rate(2); // 10 Hz
+        ros::Rate rate(10); // 10 Hz
         while (ros::ok()) {
             ros::spinOnce();
             rate.sleep();
@@ -44,9 +55,9 @@ public:
     
 
 private:
-    ros::NodeHandle nh_;
-    ros::NodeHandle private_nh_;
-    ros::Subscriber sub_scan_;
+    ros::NodeHandle nh_;                            //!< node handle
+    ros::NodeHandle private_nh_;                    //!< private node handle
+    ros::Subscriber sub_scan_;                      //!< subscriber to scan topic
     ros::Subscriber sub_prop_;
     ros::Publisher pub_prop_closest_;
     std::string prop_topic_;
