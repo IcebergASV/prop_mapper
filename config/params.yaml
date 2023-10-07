@@ -12,6 +12,6 @@ vel_scale_factor: 1.0 #scaling factor for velocity
 
 
 # fake_angle_finder
-theta_1: 1 #radians
-theta_2: 3 #radians
+theta_1: 0.01 #radians
+theta_2: 3.14 #radians
 

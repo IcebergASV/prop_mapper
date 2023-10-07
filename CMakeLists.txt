@@ -118,14 +118,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-add_library(lidarPointLib
-  lib/lidarPoint.cpp
-  include/lidarPoint.h
+add_library(liblidar_point
+  lib/lidar_point.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -165,8 +164,8 @@ target_link_libraries(prop_map ${catkin_LIBRARIES})
 add_dependencies(prop_map ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(coord_finder
-  lidarPointLib
+target_link_libraries(distance_finder
+  liblidar_point
 )
 
 #############

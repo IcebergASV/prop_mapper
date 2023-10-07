@@ -5,7 +5,7 @@
 #include <cmath>
 #include <vector>
 #include <stdexcept>
-#include "lidarPoint.h"
+#include "lidar_point.h"
 #include <string>
 #include <iostream>
 #include <ros/console.h>
@@ -269,11 +269,11 @@ private:
 
 };
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "coord_finder");
+    ros::init(argc, argv, "distance_finder");
     if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
         ros::console::notifyLoggerLevelsChanged();
-    CoordFinder coord_finder;
+    DistanceFinder distance_finder;
 
-    coord_finder.spin();
+    distance_finder.spin();
     return 0;
 }
