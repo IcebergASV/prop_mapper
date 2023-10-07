@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
-#include <prop_follower/PropAngleRange.h>
+#include <prop_mapper/PropAngleRange.h>
 #include <geometry_msgs/Vector3.h>
 #include <cmath>
 #include <vector>
@@ -41,8 +41,8 @@ public:
         private_nh_.param<std::string>("scan_topic", scan_topic_, "/scan");
         
         // set up subscribers
-        sub_scan_ = nh_.subscribe(scan_topic_, 1, &CoordFinder::scanCallback, this);
-        sub_prop_angles_ = nh_.subscribe(prop_topic_, 1, &CoordFinder::propCallback, this);
+        sub_scan_ = nh_.subscribe(scan_topic_, 1, &DistanceFinder::scanCallback, this);
+        sub_prop_angles_ = nh_.subscribe(prop_angles_topic_, 1, &DistanceFinder::propCallback, this);
 
         // set up publishers
         pub_prop_xy_dist_ = nh_.advertise<geometry_msgs::Vector3>("/prop_xy_dist", 1);
@@ -72,7 +72,7 @@ private:
     double laser_angle_increment_;                  //!< increment between readings within a LiDAR scan
     double angle_error_adjustment_;                 //!< used to expand the angles provided from bounding boxes
     
-    prop_follower::PropAngleRange prop_angles_msg_; //!< prop angles message from bounding boxes
+    prop_mapper::PropAngleRange prop_angles_msg_; //!< prop angles message from bounding boxes
     sensor_msgs::LaserScan scan_msg_;               //!< 
 
     std::string TAG = "DISTANCE_FINDER: ";          //!< tag for logging and debug messages
@@ -87,7 +87,7 @@ private:
     @param[in] msg PropAngleRange message
     @returns true if message is valid    
     */
-    bool isValidProp(const prop_follower::PropAngleRange::ConstPtr& msg)
+    bool isValidProp(const prop_mapper::PropAngleRange::ConstPtr& msg)
     {
         bool valid_msg = true;
 
@@ -196,7 +196,7 @@ private:
     * 
     * Runs whenever a message is published on /prop_angle_range 
     */
-    void propCallback(const prop_follower::PropAngleRange::ConstPtr& msg) {
+    void propCallback(const prop_mapper::PropAngleRange::ConstPtr& msg) {
         // save the PropAngleRange message for later use
         prop_angles_msg_ = *msg;
         ROS_DEBUG_STREAM(TAG << "Received PropInProgress message with theta_small=" << prop_angles_msg_.theta_small << " and theta_large=" << prop_angles_msg_.theta_large);
@@ -236,7 +236,7 @@ private:
 
         //create a 2D vector containing distance angle pairs for points detected by lidar      
         double starting_angle = laser_angle_min_ + (M_PI/2.0); //starting angle for lidar scan 
-        std::vector<lidarPoint> scanPoints = CoordFinder::createLidarPoints(scan_msg_.ranges, starting_angle, laser_angle_increment_);
+        std::vector<lidarPoint> scanPoints = DistanceFinder::createLidarPoints(scan_msg_.ranges, starting_angle, laser_angle_increment_);
         if (scanPoints.size()<1){
             ROS_WARN_STREAM(TAG << "No points added to scanPoints vector");
             return;

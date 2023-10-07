@@ -1,8 +1,8 @@
 #include <ros/ros.h>
-#include <navigation_pkg/Compass.h> 
-#include <navigation_pkg/PropInProgress.h>
-#include <navigation_pkg/Prop.h>
-#include <navigation_pkg/SimpleGPS.h> //temporary
+#include <prop_mapper/Compass.h> 
+#include <prop_mapper/PropInProgress.h>
+#include <prop_mapper/Prop.h>
+#include <prop_mapper/SimpleGPS.h> //temporary
 #include <geographic_msgs/GeoPoint.h>
 #include <cmath> 
 

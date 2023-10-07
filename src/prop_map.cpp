@@ -1,6 +1,6 @@
 #include <ros/ros.h>
-#include <navigation_pkg/Prop.h>
-#include <navigation_pkg/PropArray.h>
+#include <Prop.h>
+#include <PropArray.h>
 
 class PropMapping {
 public:
