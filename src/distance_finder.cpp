@@ -87,7 +87,7 @@ private:
     @param[in] msg PropAngleRange message
     @returns true if message is valid    
     */
-    bool isValidProp(const prop_mapper::PropAngleRange::ConstPtr& msg)
+    bool isValidProp(const prop_mapper::PropAngleRange msg)
     {
         bool valid_msg = true;
 
@@ -116,8 +116,8 @@ private:
     bool getScanIndexes(int &index1, int &index2, double index1_angle, double index2_angle, double laser_angle_max, double laser_angle_increment, const sensor_msgs::LaserScan &scan_msg)
     {
         double steps = (laser_angle_max * 2) / laser_angle_increment; 
-        int index1 = (int)(((index1_angle + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
-        int index2 = (int)(((index2_angle + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
+        index1 = (int)(((index1_angle + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
+        index2 = (int)(((index2_angle + (laser_angle_max - (M_PI/2))) / (laser_angle_max*2))* steps);
         ROS_DEBUG_STREAM(TAG << "index1 :" << index1 << " index2: " << index2);
         ROS_DEBUG_STREAM(TAG << "size of scan message ranges " << scan_msg.ranges.size());
 
@@ -222,7 +222,10 @@ private:
         ROS_DEBUG_STREAM(TAG << "Laser angle increment" << laser_angle_increment_);
 
         // display warning and exit function if PropAngleRange message is invalid
-        if(!isValidProp(prop_angles_msg_)) {return;}
+        if(!isValidProp(prop_angles_msg_))
+        {
+            return;
+        }
 
         //add a safety range onto the bounding box angles
         double index1_angle = prop_angles_msg_.theta_small + angle_error_adjustment_;
@@ -231,7 +234,7 @@ private:
         // calculate the range indexes for the given theta angles
         int index1;
         int index2;
-        getScanIndexes(index1, index2, index1_angle, index2_angle, laser_angle_max_, laser_angle_increment_, scan_msg);
+        getScanIndexes(index1, index2, index1_angle, index2_angle, laser_angle_max_, laser_angle_increment_, scan_msg_);
 
 
         //create a 2D vector containing distance angle pairs for points detected by lidar      
