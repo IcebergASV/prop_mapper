@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-#include <prop_follower/PropAngleRange.h>
+#include <prop_mapper/PropAngleRange.h>
 #include <cmath>
 
 /**
@@ -19,9 +19,9 @@ void fake_bbox_angles() {
     private_nh_.param<double>("theta_small", theta_small, 0.0);
     private_nh_.param<double>("theta_large", theta_large, M_PI);
 
-    ros::Publisher pub = nh.advertise<prop_follower::PropAngleRange>("prop_angle_range", 1);
+    ros::Publisher pub = nh.advertise<prop_mapper::PropAngleRange>("prop_angle_range", 1);
     ros::Rate rate(10); // 10 Hz
-    prop_follower::PropAngleRange msg;
+    prop_mapper::PropAngleRange msg;
 
     // Message
     msg.prop_label = "buoy";
