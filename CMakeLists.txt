@@ -56,6 +56,7 @@ add_message_files(
   Prop.msg
   PropAngleRange.msg
   PropArray.msg
+  PropDistances.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -153,13 +154,13 @@ add_library(liblidar_point
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-#add_executable(coord_finder src/coord_finder.cpp)
-#target_link_libraries(coord_finder ${catkin_LIBRARIES})
-#add_dependencies(coord_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-#
-#add_executable(fake_angle_finder src/fake_angle_finder.cpp)
-#target_link_libraries(fake_angle_finder ${catkin_LIBRARIES})
-#add_dependencies(fake_angle_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+add_executable(coord_finder src/coord_finder.cpp)
+target_link_libraries(coord_finder ${catkin_LIBRARIES})
+add_dependencies(coord_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+add_executable(fake_angle_finder src/fake_angle_finder.cpp)
+target_link_libraries(fake_angle_finder ${catkin_LIBRARIES})
+add_dependencies(fake_angle_finder ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 add_executable(distance_finder src/distance_finder.cpp)
 target_link_libraries(distance_finder ${catkin_LIBRARIES})

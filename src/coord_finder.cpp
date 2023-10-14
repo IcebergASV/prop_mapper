@@ -1,22 +1,34 @@
 #include <ros/ros.h>
-#include <prop_mapper/Compass.h> 
-#include <prop_mapper/PropInProgress.h>
+#include <prop_mapper/PropDistances.h>
 #include <prop_mapper/Prop.h>
-#include <prop_mapper/SimpleGPS.h> //temporary
-#include <geographic_msgs/GeoPoint.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <cmath> 
+#include <ros/console.h>
 
+/**
+* @brief Maps props detected by LiDAR to local coordinate frame
+* 
+* Takes the x&y distances from the robot to the prop, and the robot's current local position to map the 
+* prop in the local coordinate frame. 
+*
+*/
 class CoordFinder {
 public:
     CoordFinder()
     {
-        gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &CoordFinder::gpsCallback, this);
-        compass_sub_ = nh_.subscribe("/rectbot_heading", 1, &CoordFinder::compassCallback, this );
-        prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &CoordFinder::propCallback, this);
-        prop_pub_ = nh_.advertise<navigation_pkg::Prop>("/completed_props", 1);
-        //nh_.getParam("safety_range", safety_range); not working right now
-        //nh_.getParam("degrees_lat_per_meter", degrees_lat_per_meter);
-        //nh_.getParam("degrees_lon_per_meter", degrees_lon_per_meter);
+        // get ROS parameters
+        private_nh_.param<double>("coord_mapping_error_estimation", coord_mapping_error_estimation_, 0.0);
+        
+        // Specify ROS topic names - using parameters for this so that we can change names from launch files
+        private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_angle_range");
+        private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/local_position/pose");
+        
+        // set up subscribers
+        sub_pose_ = nh_.subscribe(local_pose_topic_, 1, &CoordFinder::poseCallback, this);
+        sub_prop_distances_ = nh_.subscribe(prop_distances_topic_, 1, &DistanceFinder::propCallback, this);
+
+        // set up publishers
+        pub_prop_coords_ = nh_.advertise<prop_mapper::Prop>("/completed_props", 1);
         
     }
 
@@ -29,16 +41,29 @@ public:
     }
 
 private:
-    void gpsCallback(const navigation_pkg::SimpleGPS::ConstPtr& msg)
-    {
-        robot_lat_ = msg->latitude;
-        robot_lon_ = msg->longitude;
-        robot_alt_ = msg->altitude;
-    }
 
-    void compassCallback(const navigation_pkg::Compass::ConstPtr& msg)
+    ros::NodeHandle nh_;            
+    ros::NodeHandle private_nh_;                  
+    ros::Subscriber sub_pose_;                     
+    ros::Subscriber sub_prop_distances_;        
+    ros::Publisher pub_prop_coords_;             
+    std::string prop_distances_topic_;               
+    std::string local_pose_topic_;   
+    
+    double coord_mapping_error_estimation_;       //!< used to place a safety range around props to avoid duplicates in the map
+    
+    prop_mapper::PropDistances prop_distances_msg_;
+    geometry_msgs::PoseStamped pose_msg_;
+
+    double robot_x_;
+    double robot_y_;
+    double robot_z_;
+
+    void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
-        robot_heading = msg->heading;
+        robot_x_ = msg->pose->position->x;
+        robot_y_ = msg->pose->position->y;
+        robot_z_ = msg->pose->position->z;
     }
 
     void propCallback(const navigation_pkg::PropInProgress::ConstPtr& msg)
@@ -104,6 +129,8 @@ private:
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "coord_finder_node");
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
+        ros::console::notifyLoggerLevelsChanged();
     CoordFinder coord_finder;
     coord_finder.spin();
     return 0;
