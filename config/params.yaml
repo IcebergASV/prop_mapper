@@ -10,8 +10,7 @@ min_lidar_range: 0.1 #meters - should be slight larger than real, or accurate ra
 vel_scale_factor: 1.0 #scaling factor for velocity
 
 # prop map
-x_safety_distance: 1.0
-y_safety_distance: 1.0
+mapping_safety_radius: 1.0
 
 # fake_angle_finder
 theta_1: 0.01 #radians

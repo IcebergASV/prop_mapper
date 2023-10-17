@@ -7,8 +7,7 @@ public:
     PropMapping()
     {
         // get ROS parameters
-        private_nh_.param<double>("x_safety_distance", x_safety_, 1.0);
-        private_nh_.param<double>("y_safety_distance", y_safety_, 1.0);
+        private_nh_.param<double>("mapping_safety_radius", safety_radius_, 1.0);
        
         prop_sub_ = nh_.subscribe("/completed_props", 1, &PropMapping::propCallback, this);
         prop_pub_ = nh_.advertise<prop_mapper::PropArray>("/prop_array", 1);
@@ -33,8 +32,7 @@ private:
 
     std::string TAG = "PROP_MAP: ";          //!< tag for logging and debug messages
 
-    double x_safety_;
-    double y_safety_;
+    double safety_radius_;
 
     void propCallback(const prop_mapper::Prop::ConstPtr& msg)
     {
