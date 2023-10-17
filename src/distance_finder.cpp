@@ -46,7 +46,7 @@ public:
         sub_prop_angles_ = nh_.subscribe(prop_angles_topic_, 1, &DistanceFinder::propCallback, this);
 
         // set up publishers
-        pub_prop_xy_dist_ = nh_.advertise<geometry_msgs::Vector3>("/prop_xy_dist", 1);
+        pub_prop_xy_dist_ = nh_.advertise<prop_mapper::Prop>("/prop_xy_dist", 1);
     }
 
     void spin() {
@@ -74,7 +74,7 @@ private:
     double angle_error_adjustment_;                 //!< used to expand the angles provided from bounding boxes
     
     prop_mapper::PropAngleRange prop_angles_msg_; //!< prop angles message from bounding boxes
-    sensor_msgs::LaserScan scan_msg_;               //!< 
+    sensor_msgs::LaserScan scan_msg_;              
 
     std::string TAG = "DISTANCE_FINDER: ";          //!< tag for logging and debug messages
 

@@ -1,6 +1,0 @@
-float64 min_latitude
-float64 max_latitude
-float64 min_longitude
-float64 max_longitude
-float64 min_altitude
-float64 max_altitude 

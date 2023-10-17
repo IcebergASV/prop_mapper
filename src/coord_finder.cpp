@@ -18,7 +18,7 @@ public:
     {
         
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
-        private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_angle_range");
+        private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_xy_dist");
         private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/local_position/pose");
         
         // set up subscribers
