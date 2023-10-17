@@ -56,7 +56,6 @@ add_message_files(
   Prop.msg
   PropAngleRange.msg
   PropArray.msg
-  PropDistances.msg
 )
 
 ## Generate services in the 'srv' folder

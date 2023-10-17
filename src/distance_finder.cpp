@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <prop_mapper/PropAngleRange.h>
-#include <prop_mapper/PropDistances.h>
+#include <prop_mapper/Prop.h>
 #include <geometry_msgs/Vector3.h>
 #include <cmath>
 #include <vector>
@@ -264,7 +264,7 @@ private:
         getClosestObject(selected_points, closest_distance, closest_angle);
 
         // Publish Message
-        prop_mapper::PropDistances prop_rel_coords_msg;
+        prop_mapper::Prop prop_rel_coords_msg;
         prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
         prop_rel_coords_msg.vector.x = closest_distance*sin(closest_angle); //North
         prop_rel_coords_msg.vector.y = closest_distance*cos(closest_angle); //East 
