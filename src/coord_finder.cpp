@@ -55,15 +55,23 @@ private:
     prop_mapper::PropDistances prop_distances_msg_;
     geometry_msgs::PoseStamped pose_msg_;
 
-    double robot_x_;
-    double robot_y_;
-    double robot_z_;
+    double robot_pose_x_;
+    double robot_pose_y_;
+    double robot_pose_z_;
+    double robot_orientation_x_;
+    double robot_orientation_y_;
+    double robot_orientation_z_;
+    double robot_orientation_w_;
 
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
         robot_x_ = msg->pose->position->x;
         robot_y_ = msg->pose->position->y;
         robot_z_ = msg->pose->position->z;
+        robot_orientation_x_ = msg->pose->orientation->x;
+        robot_orientation_y_ = msg->pose->orientation->y;
+        robot_orientation_z_ = msg->pose->orientation->z;
+        robot_orientation_w_ = msg->pose->orientation->w;
     }
 
     void propCallback(const navigation_pkg::PropInProgress::ConstPtr& msg)
