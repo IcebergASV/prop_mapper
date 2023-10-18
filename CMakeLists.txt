@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -49,11 +50,12 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Prop.msg
+  PropAngleRange.msg
+  PropArray.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -70,10 +72,13 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geographic_msgs#   geometry_msgs#   sensor_msgs#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  geographic_msgs
+  geometry_msgs
+  sensor_msgs
+  std_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -118,14 +123,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-add_library(lidarPointLib
-  lib/lidarPoint.cpp
-  include/lidarPoint.h
+add_library(liblidar_point
+  lib/lidar_point.cpp
 )
 
 ## Add cmake target dependencies of the library
@@ -165,8 +169,8 @@ target_link_libraries(prop_map ${catkin_LIBRARIES})
 add_dependencies(prop_map ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(coord_finder
-  lidarPointLib
+target_link_libraries(distance_finder
+  liblidar_point
 )
 
 #############

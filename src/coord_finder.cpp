@@ -1,22 +1,32 @@
 #include <ros/ros.h>
-#include <navigation_pkg/Compass.h> 
-#include <navigation_pkg/PropInProgress.h>
-#include <navigation_pkg/Prop.h>
-#include <navigation_pkg/SimpleGPS.h> //temporary
-#include <geographic_msgs/GeoPoint.h>
+#include <prop_mapper/PropDistances.h>
+#include <prop_mapper/Prop.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <cmath> 
+#include <ros/console.h>
 
+/**
+* @brief Maps props detected by LiDAR to local coordinate frame
+* 
+* Takes the x&y distances from the robot to the prop, and the robot's current local position and orientation to map the 
+* prop in the local coordinate frame. 
+*
+*/
 class CoordFinder {
 public:
     CoordFinder()
     {
-        gps_sub_ = nh_.subscribe("/rectbot_coords", 1, &CoordFinder::gpsCallback, this);
-        compass_sub_ = nh_.subscribe("/rectbot_heading", 1, &CoordFinder::compassCallback, this );
-        prop_sub_ = nh_.subscribe("/prop_closest_point", 1, &CoordFinder::propCallback, this);
-        prop_pub_ = nh_.advertise<navigation_pkg::Prop>("/completed_props", 1);
-        //nh_.getParam("safety_range", safety_range); not working right now
-        //nh_.getParam("degrees_lat_per_meter", degrees_lat_per_meter);
-        //nh_.getParam("degrees_lon_per_meter", degrees_lon_per_meter);
+        
+        // Specify ROS topic names - using parameters for this so that we can change names from launch files
+        private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_xy_dist");
+        private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/local_position/pose");
+        
+        // set up subscribers
+        sub_pose_ = nh_.subscribe(local_pose_topic_, 1, &CoordFinder::poseCallback, this);
+        sub_prop_distances_ = nh_.subscribe(prop_distances_topic_, 1, &CoordFinder::propCallback, this);
+
+        // set up publishers
+        pub_prop_coords_ = nh_.advertise<prop_mapper::Prop>("/completed_props", 1);
         
     }
 
@@ -29,81 +39,55 @@ public:
     }
 
 private:
-    void gpsCallback(const navigation_pkg::SimpleGPS::ConstPtr& msg)
+
+    ros::NodeHandle nh_;            
+    ros::NodeHandle private_nh_;                  
+    ros::Subscriber sub_pose_;                     
+    ros::Subscriber sub_prop_distances_;        
+    ros::Publisher pub_prop_coords_;             
+    std::string prop_distances_topic_;               
+    std::string local_pose_topic_;   
+
+    geometry_msgs::PoseStamped pose_msg_;
+
+    /**
+    @brief Gets the robot's current position and orientation
+    */
+    void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
-        robot_lat_ = msg->latitude;
-        robot_lon_ = msg->longitude;
-        robot_alt_ = msg->altitude;
+        pose_msg_ = *msg;
     }
 
-    void compassCallback(const navigation_pkg::Compass::ConstPtr& msg)
+    /**
+    @brief Gets the prop's coordinates relative to the position and orientation of the robot and converts to local coordinates and publishes the prop's local coordinates
+    */
+    void propCallback(const prop_mapper::Prop::ConstPtr& msg)
     {
-        robot_heading = msg->heading;
-    }
 
-    void propCallback(const navigation_pkg::PropInProgress::ConstPtr& msg)
-    {
-        //// Calculate the GPS coordinates of the prop
-        double dist = msg->closest_pnt_dist;
-        double angle = msg->closest_pnt_angle;
-        double prop_heading;
-        
-        if ((robot_heading - angle) > (2*M_PI))
-            prop_heading = robot_heading - angle - (2* M_PI);
-        else 
-            prop_heading = robot_heading - angle;
+        // Relative prop coordinates
+        double prop_x_rel_ = msg->vector.x;
+        double prop_y_rel_ = msg->vector.y;
+        double prop_z_rel_ = msg->vector.z;
 
-        double north_dist = dist * cos(prop_heading);
-        double east_dist = dist * sin(prop_heading);
-
-        double lat_diff = north_dist * degrees_lat_per_meter;
-        double lon_diff = east_dist * degrees_lon_per_meter;
-
-        double prop_lat = robot_lat_ + lat_diff;
-        double prop_lon = robot_lon_ + lon_diff;
-        double prop_alt = robot_alt_;
-
-
-        double lat_safety_range = degrees_lat_per_meter * safety_range;
-        double lon_safety_range = degrees_lon_per_meter * safety_range;
+        // Convert relative coordinates to local coordinates - TODO
 
         
-        // Create and publish the Prop message with the prop coordinates
-        navigation_pkg::Prop prop_msg;
-        prop_msg.prop_type = msg->prop_type;
+        // Create and publish the Prop message with the prop's local coordinates 
+        prop_mapper::Prop local_prop_msg;
+        local_prop_msg.prop_label = msg->prop_label;
 
-        prop_msg.prop_coords.latitude = prop_lat;
-        prop_msg.prop_coords.longitude = prop_lon;
-        prop_msg.prop_coords.altitude = prop_alt;
+        // Coordinates TODO
 
-        prop_msg.prop_coord_range.min_latitude = prop_lat - lat_safety_range;
-        prop_msg.prop_coord_range.max_latitude = prop_lat + lat_safety_range;
-        prop_msg.prop_coord_range.min_longitude = prop_lon - lon_safety_range;
-        prop_msg.prop_coord_range.max_longitude = prop_lon + lon_safety_range;
-
-        prop_pub_.publish(prop_msg);
+        pub_prop_coords_.publish(local_prop_msg);
     }
-
-    ros::NodeHandle nh_;
-    ros::Subscriber gps_sub_;
-    ros::Subscriber prop_sub_;
-    ros::Subscriber compass_sub_;
-    ros::Publisher prop_pub_;
-    double robot_lat_;
-    double robot_lon_;
-    double robot_alt_;
-    double robot_heading;
-    double safety_range = 0.1;
-    double degrees_lat_per_meter = 8.9942910391e-06;
-    double degrees_lon_per_meter = 1.32865719904e-05;
-
-
 
 
 };
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "coord_finder_node");
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
+        ros::console::notifyLoggerLevelsChanged();
     CoordFinder coord_finder;
     coord_finder.spin();
     return 0;
