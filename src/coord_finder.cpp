@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <prop_mapper/PropDistances.h>
 #include <prop_mapper/Prop.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <cmath> 
@@ -69,27 +68,28 @@ private:
         double prop_y_rel = msg->vector.y;
         double prop_z_rel = msg->vector.z;
 
-        // Convert relative coordinates to local coordinates - TODO
-        double qw = pose_msg_.pose.quaternion.w;
-        double qx = pose_msg_.pose.quaternion.x;
-        double qy = pose_msg_.pose.quaternion.y; 
-        double qz = pose_msg_.pose.quaternion.z;
+        // Convert relative coordinates to local coordinates
+        double qw = pose_msg_.pose.orientation.w;
+        double qx = pose_msg_.pose.orientation.x;
+        double qy = pose_msg_.pose.orientation.y; 
+        double qz = pose_msg_.pose.orientation.z;
 
         double siny_cosp = 2 * (qw * qz + qx * qy);
         double cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
 
         double yaw = std::atan2(siny_cosp, cosy_cosp);
 
-        double local_x = prop_x_rel_*cos(yaw - M_PI_2) - prop_y_rel_*sin(yaw - M_PI_2);
-        double local_y = prop_x_rel_*sin(yaw - M_PI_2) + prop_y_rel_*cos(yaw - M_PI_2);
+        double local_x = prop_x_rel*cos(yaw - M_PI_2) - prop_y_rel*sin(yaw - M_PI_2);
+        double local_y = prop_x_rel*sin(yaw - M_PI_2) + prop_y_rel*cos(yaw - M_PI_2);
         
         // Create and publish the Prop message with the prop's local coordinates 
         prop_mapper::Prop local_prop_msg;
         local_prop_msg.prop_label = msg->prop_label;
 
-        // Coordinates TODO
-        new_X = pose_msg_.pose.position.x + local_x_;
-        new_Y = pose_msg_.pose.position.y + local_y_;
+        // Coordinates
+        local_prop_msg.vector.x = pose_msg_.pose.position.x + local_x;
+        local_prop_msg.vector.y = pose_msg_.pose.position.y + local_y;
+        local_prop_msg.vector.z = pose_msg_.pose.position.z;
 
         pub_prop_coords_.publish(local_prop_msg);
     }
