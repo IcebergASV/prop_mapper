@@ -3,7 +3,12 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <cmath> 
 #include <ros/console.h>
+#include <string>
+#include <iostream>
+#include <nav_msgs/Odometry.h>
 
+
+std::string TAG = "WP_SENDER: ";
 /**
 * @brief Maps props detected by LiDAR to local coordinate frame
 * 
@@ -18,7 +23,7 @@ public:
         
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
         private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_xy_dist");
-        private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/local_position/pose");
+        private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/mavros/local_position/pose");
         
         // set up subscribers
         sub_pose_ = nh_.subscribe(local_pose_topic_, 1, &CoordFinder::poseCallback, this);
@@ -54,7 +59,16 @@ private:
     */
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
+        // ROS_ERROR_STREAM("Hello");
         pose_msg_ = *msg;
+        ROS_INFO_STREAM("boat_x: " << pose_msg_.pose.position.x
+        << "boat_y: " << pose_msg_.pose.position.y
+        << "boat_z: " << pose_msg_.pose.position.z
+        << "qw: " << pose_msg_.pose.orientation.w
+        << "qx: " << pose_msg_.pose.orientation.x
+        << "qy: " << pose_msg_.pose.orientation.y
+        << "qz: " << pose_msg_.pose.orientation.z
+        );
     }
 
     /**
@@ -68,11 +82,26 @@ private:
         double prop_y_rel = msg->vector.y;
         double prop_z_rel = msg->vector.z;
 
+        // Fix for gazebo
+        // double prop_x_rel = msg->vector.y;
+        // double prop_y_rel = msg->vector.x;
+        // double prop_z_rel = msg->vector.z;
+
         // Convert relative coordinates to local coordinates
         double qw = pose_msg_.pose.orientation.w;
         double qx = pose_msg_.pose.orientation.x;
         double qy = pose_msg_.pose.orientation.y; 
         double qz = pose_msg_.pose.orientation.z;
+
+        // Boat coordinates
+        double boat_x = pose_msg_.pose.position.x;
+        double boat_y = pose_msg_.pose.position.y;
+        double boat_z = pose_msg_.pose.position.z;
+
+        // Fix for gazebo
+        // double boat_x = pose_msg_.pose.position.y;
+        // double boat_y = -pose_msg_.pose.position.x;
+        // double boat_z = pose_msg_.pose.position.z;
 
         double siny_cosp = 2 * (qw * qz + qx * qy);
         double cosy_cosp = 1 - 2 * (qy * qy + qz * qz);
@@ -86,14 +115,29 @@ private:
         prop_mapper::Prop local_prop_msg;
         local_prop_msg.prop_label = msg->prop_label;
 
+        ROS_ERROR_STREAM(TAG << " \nprop_x_rel: " << prop_x_rel
+        << " \nprop_y_rel: " << prop_y_rel
+        << " \nprop_z_rel: " << prop_z_rel
+        << " \nboat_x: " << boat_x
+        << " \nboat_y: " << boat_y
+        << " \nboat_z: " << boat_z
+        << " \nqw: " << qw
+        << " \nqx: " << qx
+        << " \nqy: " << qy
+        << " \nqz: " << qz
+        << " \nlocal_x: " << local_x
+        << " \nlocal_y: " << local_y
+        << " \nglobal_prop_x: " << boat_x + local_x
+        << " \nglobal_prop_y: " << boat_y + local_y
+        );
+
         // Coordinates
-        local_prop_msg.vector.x = pose_msg_.pose.position.x + local_x;
-        local_prop_msg.vector.y = pose_msg_.pose.position.y + local_y;
-        local_prop_msg.vector.z = pose_msg_.pose.position.z;
+        local_prop_msg.vector.x = boat_x + local_x;
+        local_prop_msg.vector.y = boat_y + local_y;
+        local_prop_msg.vector.z = boat_z;
 
         pub_prop_coords_.publish(local_prop_msg);
     }
-
 
 };
 
