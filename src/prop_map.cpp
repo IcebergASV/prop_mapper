@@ -37,7 +37,8 @@ private:
     void propCallback(const prop_mapper::Prop::ConstPtr& msg)
     {
         // get prop info from message - TODO
-        prop_mapper::Prop prop;
+        // is working??
+        prop_mapper::Prop prop = *msg;
 
         //make sure prop is not already in array
         if (isPropInArray(prop) == false){
@@ -54,18 +55,21 @@ private:
 
     bool isPropInArray(prop_mapper::Prop prop){
         //use safety ranges to decide if prop is already in array
+        bool propExists = false;
         for (int i = 0; i < prop_array.props.size(); i++) {
             prop_mapper::Prop checkprop = prop_array.props[i];
-            
-            if (0)// TODO Replace with checking conditions to see if prop falls within the safety range of any existing props
-            {
-                //prop is already in array, don't add it to the array
-                return true;
-                ROS_INFO_STREAM(TAG << "Prop is already in the array");
+            if (checkprop.vector.x < prop.vector.x+safety_radius_ & checkprop.vector.x > prop.vector.y-safety_radius_) {
+                if (checkprop.vector.y < prop.vector.y+safety_radius_ & checkprop.vector.y > prop.vector.y-safety_radius_) {
+                    // getting here means an existing prop (checkprop) is witin range of the new prop (prop)
+                    if (checkprop.prop_label == prop.prop_label) {
+                        // if we get here, same type prop detected within safety radius, so we assume it already exists
+                        propExists = true;
+                        ROS_INFO_STREAM(TAG << "Prop is already in the array");
+                    }
+                }
             }
-
         }
-        return false;       
+        return propExists;       
 
     }
 

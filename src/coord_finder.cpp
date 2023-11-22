@@ -1,5 +1,4 @@
 #include <ros/ros.h>
-#include <prop_mapper/PropDistances.h>
 #include <prop_mapper/Prop.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <cmath> 
