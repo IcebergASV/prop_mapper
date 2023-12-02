@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+  <!--Launch file for sim-->
+
+  <node name="fake_angle_finder" pkg="prop_mapper" type="fake_angle_finder" output="log">
+    <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
+  </node>
+
+  <node name="distance_finder" pkg="prop_mapper" type="distance_finder" output="log">
+    <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
+  </node>
+
+  <node name="coord_finder" pkg="prop_mapper" type="coord_finder" output="log">
+    <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
+  </node>
+
+  <!--node name="prop_map" pkg="prop_mapper" type="prop_map" output="log">
+    <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
+  </node-->
+
+</launch>
