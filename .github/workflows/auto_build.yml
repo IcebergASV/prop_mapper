@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -28,7 +28,7 @@ jobs:
     
     - uses: ros-tooling/action-ros-ci@v0.3
       with:
-        package-name: my_package
+        package-name: prop_mapper
         target-ros1-distro: melodic
         skip-tests: true
 
