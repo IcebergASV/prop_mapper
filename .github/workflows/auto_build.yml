@@ -1,0 +1,35 @@
+name: AutoBuild
+
+on:
+  push:
+    branches: [ "gp-AddingWorkFlowsForBuilding" ]
+  pull_request:
+    branches: [ "gp-AddingWorkFlowsForBuilding" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+         ros_version: [melodic]
+    env:
+      ROS_DISTRO: ${{ matrix.ros_version }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up ROS environment
+      uses: ros-tooling/setup-ros@v2
+      with:
+        ros-distro: ${{ matrix.ros_version }}
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        rosdep install --from-paths src --ignore-src -r -y
+
+    - name: Build the ROS package
+      run: catkin build
