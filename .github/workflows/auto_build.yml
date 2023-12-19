@@ -22,7 +22,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up ROS environment
-      uses: ros-tooling/setup-ros
+      uses: ros-tooling/setup-ros@v3
       with:
         ros-distro: ${{ matrix.ros_version }}
 
