@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-         ros_version: [melodic]
+         ros_version: [noetic]
     env:
       ROS_DISTRO: ${{ matrix.ros_version }}
 
@@ -24,12 +24,12 @@ jobs:
     - name: Set up ROS env
       uses: ros-tooling/setup-ros@v0.7
       with:
-        required-ros-distributions: melodic
+        required-ros-distributions: noetic
     
     - uses: ros-tooling/action-ros-ci@v0.3
       with:
         package-name: prop_mapper
-        target-ros1-distro: melodic
+        target-ros1-distro: noetic
         skip-tests: true
 
     - name: Install dependencies
