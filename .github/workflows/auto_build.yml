@@ -22,9 +22,10 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up ROS environment
-    - uses: ros-tooling/setup-ros@v0.7
+      uses: ros-tooling/setup-ros@v0.7
       with:
         required-ros-distributions: melodic
+    
     - uses: ros-tooling/action-ros-ci@v0.3
       with:
         package-name: my_package
