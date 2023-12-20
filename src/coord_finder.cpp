@@ -60,13 +60,20 @@ private:
         return local_coords;
     }
 
-    double getYaw(const geometry_msgs::Quaternion q)
+    double getGazeboHeading(const geometry_msgs::Quaternion q)
     {
         // yaw (z-axis rotation)
         double siny_cosp = 2 * (q.w * q.z + q.x * q.y);
         double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
         double yaw = std::atan2(siny_cosp, cosy_cosp);
-        return yaw;
+
+        // convert to gazebo heading
+        double heading = yaw - (M_PI/2);
+        if (heading < 0)
+        {
+            heading = heading + (2*M_PI);
+        }
+        return heading;
     }
 
     /**
@@ -75,18 +82,16 @@ private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
         pose_msg_ = *msg;
-        double yaw = getYaw(pose_msg_.pose.orientation)*(180/M_PI);
-
-        yaw = yaw - 90;
-
-        if (yaw < 0)
-        {
-            yaw = yaw + 360;
-        }
-
-
-
-        ROS_WARN_STREAM(TAG << "yaw: " << yaw);
+        //double yaw = getYaw(pose_msg_.pose.orientation)*(180/M_PI);
+//
+        //yaw = yaw - 90;
+//
+        //if (yaw < 0)
+        //{
+        //    yaw = yaw + 360;
+        //}
+//
+        ROS_WARN_STREAM(TAG << "yaw: " << getGazeboHeading(pose_msg_.pose.orientation)*(180/M_PI));
 
     }
 
@@ -98,9 +103,8 @@ private:
     void propCallback(const prop_mapper::Prop::ConstPtr& msg)
     {
         // Relative prop coordinates
-        double prop_x_rel_ = msg->vector.x;
-        double prop_y_rel_ = msg->vector.y;
-        double prop_z_rel_ = msg->vector.z;
+        double prop_x_rel = msg->vector.x;
+        double prop_y_rel = msg->vector.y;
 
         // Convert relative coordinates to local coordinates - TODO
 
@@ -111,8 +115,15 @@ private:
 
         // Coordinates TODO
 
+        double heading = getGazeboHeading(pose_msg_.pose.orientation);
 
+        double d = prop_x_rel*tan((M_PI/2)-heading);
 
+        double prop_x_aligned = (prop_x_rel/cos((M_PI/2)-heading)) + (prop_y_rel-d)*cos(heading);
+        double prop_y_aligned = (prop_y_rel-d)*sin(heading);
+
+        ROS_DEBUG_STREAM(TAG << "x prime = " << prop_x_aligned);
+        ROS_DEBUG_STREAM(TAG << "y prime = " << prop_y_aligned);
         pub_prop_coords_.publish(local_prop_msg);
     }
 
@@ -121,7 +132,7 @@ private:
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "coord_finder_node");
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Warn))
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
         ros::console::notifyLoggerLevelsChanged();
     CoordFinder coord_finder;
     coord_finder.spin();
