@@ -9,7 +9,7 @@
 * @brief Maps props detected by LiDAR to local coordinate frame
 * 
 * Takes the x&y distances from the robot to the prop, and the robot's current local position and orientation to map the 
-* prop in the local coordinate frame. 
+* prop in the local coordinate frame 
 *
 */
 class CoordFinder {
