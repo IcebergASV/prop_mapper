@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <prop_mapper/PropAngleRange.h>
 #include <cmath>
+#include <ros/console.h>
 
 /**
  * @brief Node to publish fake angle ranges for testing without camera
@@ -29,7 +30,7 @@ void fake_bbox_angles() {
     msg.theta_large = theta_large;
 
     while (ros::ok()) {
-        ROS_INFO_STREAM(msg);
+        ROS_DEBUG_STREAM(msg);
         pub.publish(msg);
         rate.sleep();
     }
@@ -37,6 +38,8 @@ void fake_bbox_angles() {
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "fake_angle_finder");
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Warn))
+    ros::console::notifyLoggerLevelsChanged();
     try {
         fake_bbox_angles();
     }
