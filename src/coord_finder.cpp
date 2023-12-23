@@ -31,7 +31,7 @@ public:
     }
 
     void spin() {
-        ros::Rate rate(1); // 10 Hz
+        ros::Rate rate(10); // 10 Hz
         while (ros::ok()) {
             ros::spinOnce();
             rate.sleep();
