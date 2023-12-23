@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/LaserScan.h>
 #include <prop_mapper/PropAngleRange.h>
-#include <prop_mapper/Prop.h>
+#include <prop_mapper/PropPolarCoords.h>
 #include <geometry_msgs/Vector3.h>
 #include <cmath>
 #include <vector>
@@ -46,7 +46,7 @@ public:
         sub_prop_angles_ = nh_.subscribe(prop_angles_topic_, 1, &DistanceFinder::propCallback, this);
 
         // set up publishers
-        pub_prop_xy_dist_ = nh_.advertise<prop_mapper::Prop>("/prop_xy_dist", 1);
+        pub_prop_polar_coords_ = nh_.advertise<prop_mapper::PropPolarCoords>("/prop_polar_coords", 1);
     }
 
     void spin() {
@@ -64,7 +64,7 @@ private:
     ros::NodeHandle private_nh_;                    //!< private node handle
     ros::Subscriber sub_scan_;                      //!< subscriber to scan topic
     ros::Subscriber sub_prop_angles_;               //!< subscriber to prop's angle ranges from bounding boxes
-    ros::Publisher pub_prop_xy_dist_;               //!< publisher for prop's relative x and y distances
+    ros::Publisher pub_prop_polar_coords_;               //!< publisher for prop's relative x and y distances
     std::string prop_angles_topic_;                 //!< prop angles topic name
     std::string scan_topic_;                        //!< scan topic name
     
@@ -263,13 +263,13 @@ private:
         double closest_angle;
         getClosestObject(selected_points, closest_distance, closest_angle);
 
+
         // Publish Message
-        prop_mapper::Prop prop_rel_coords_msg;
+        prop_mapper::PropPolarCoords prop_rel_coords_msg;
         prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
-        prop_rel_coords_msg.vector.x = closest_distance*cos(closest_angle); //North
-        prop_rel_coords_msg.vector.y = closest_distance*sin(closest_angle); //East 
-        prop_rel_coords_msg.vector.z = 0; //Down
-        pub_prop_xy_dist_.publish(prop_rel_coords_msg);
+        prop_rel_coords_msg.radius = closest_distance; 
+        prop_rel_coords_msg.angle = closest_angle; 
+        pub_prop_polar_coords_.publish(prop_rel_coords_msg);
     }
 
 };
