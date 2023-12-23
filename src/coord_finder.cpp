@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <prop_mapper/PropPolarCoords.h>
 #include <prop_mapper/Prop.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <cmath> 
@@ -17,7 +18,7 @@ public:
     {
         
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
-        private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_xy_dist");
+        private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_polar_coords");
         private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/mavros/local_position/pose");
         
         // set up subscribers
@@ -82,16 +83,8 @@ private:
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
         pose_msg_ = *msg;
-        //double yaw = getYaw(pose_msg_.pose.orientation)*(180/M_PI);
-//
-        //yaw = yaw - 90;
-//
-        //if (yaw < 0)
-        //{
-        //    yaw = yaw + 360;
-        //}
-//
-        ROS_WARN_STREAM(TAG << "yaw: " << getGazeboHeading(pose_msg_.pose.orientation)*(180/M_PI));
+
+        ROS_DEBUG_STREAM(TAG << "heading: " << getGazeboHeading(pose_msg_.pose.orientation)*(180/M_PI));
 
     }
 
@@ -100,30 +93,33 @@ private:
     /**
     @brief Gets the prop's coordinates relative to the position and orientation of the robot and converts to local coordinates and publishes the prop's local coordinates
     */
-    void propCallback(const prop_mapper::Prop::ConstPtr& msg)
+    void propCallback(const prop_mapper::PropPolarCoords::ConstPtr& msg)
     {
         // Relative prop coordinates
-        double prop_x_rel = msg->vector.x;
-        double prop_y_rel = msg->vector.y;
+        double radius = msg->radius;
+        double angle = msg->angle;
 
-        // Convert relative coordinates to local coordinates - TODO
-
-        
-        // Create and publish the Prop message with the prop's local coordinates 
-        prop_mapper::Prop local_prop_msg;
-        local_prop_msg.prop_label = msg->prop_label;
-
-        // Coordinates TODO
+        // Convert relative polar coordinates to local coordinates 
 
         double heading = getGazeboHeading(pose_msg_.pose.orientation);
 
-        double d = prop_x_rel*tan((M_PI/2)-heading);
+        double prop_x_aligned = radius*cos(angle-((M_PI/2)-heading));
+        double prop_y_aligned = radius*sin(angle-((M_PI/2)-heading));
 
-        double prop_x_aligned = (prop_x_rel/cos((M_PI/2)-heading)) + (prop_y_rel-d)*cos(heading);
-        double prop_y_aligned = (prop_y_rel-d)*sin(heading);
 
-        ROS_DEBUG_STREAM(TAG << "x prime = " << prop_x_aligned);
-        ROS_DEBUG_STREAM(TAG << "y prime = " << prop_y_aligned);
+        double prop_x =  pose_msg_.pose.position.y + prop_x_aligned;
+        double prop_y =  -pose_msg_.pose.position.x + prop_y_aligned;
+
+        // Create and publish the Prop message with the prop's local coordinates 
+        prop_mapper::Prop local_prop_msg;
+        local_prop_msg.prop_label = msg->prop_label;
+        local_prop_msg.vector.x = prop_x;
+        local_prop_msg.vector.y = prop_y;
+
+        ROS_DEBUG_STREAM(TAG << "x robot = " << pose_msg_.pose.position.y);
+        ROS_DEBUG_STREAM(TAG << "y robot = " << -pose_msg_.pose.position.x);
+        ROS_DEBUG_STREAM(TAG << "x prop = " << prop_x);
+        ROS_DEBUG_STREAM(TAG << "y prop = " << prop_y);
         pub_prop_coords_.publish(local_prop_msg);
     }
 
