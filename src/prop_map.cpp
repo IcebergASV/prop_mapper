@@ -55,20 +55,15 @@ private:
 
 
     bool isPropInArray(prop_mapper::Prop prop){
-         ROS_DEBUG_STREAM(TAG << "Banana");
         //use safety ranges to decide if prop is already in array
         bool propExists = false;
         
         for (int i = 0; i < prop_array.props.size(); i++) {
             prop_mapper::Prop checkprop = prop_array.props[i];
-            ROS_DEBUG_STREAM(TAG << "Checkprop x = " << checkprop.vector.x);
-            ROS_DEBUG_STREAM(TAG << "Prop x range from " << checkprop.vector.x-safety_radius_ << " to " << checkprop.vector.x+safety_radius_);
             bool prop_below = checkprop.vector.x < prop.vector.x+safety_radius_;
             bool prop_above = checkprop.vector.x > prop.vector.y-safety_radius_;
-            ROS_DEBUG_STREAM(TAG << prop_below <<  " above " << prop_above);
 
             if (checkprop.vector.x < prop.vector.x+safety_radius_ & checkprop.vector.x > prop.vector.x-safety_radius_) {
-                ROS_DEBUG_STREAM(TAG << "Apple");
                 if (checkprop.vector.y < prop.vector.y+safety_radius_ & checkprop.vector.y > prop.vector.y-safety_radius_) {
                     // getting here means an existing prop (checkprop) is witin range of the new prop (prop)
                     if (checkprop.prop_label == prop.prop_label) {
