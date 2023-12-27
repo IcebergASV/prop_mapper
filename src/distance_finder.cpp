@@ -36,6 +36,7 @@ public:
         
         // get ROS parameters
         private_nh_.param<double>("angle_error_adjustment", angle_error_adjustment_, 0.0);
+        private_nh_.param<double>("max_lidar_range", max_lidar_range_, 29.0);
 
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
         private_nh_.param<std::string>("prop_topic", prop_angles_topic_, "/prop_angle_range");
@@ -72,6 +73,7 @@ private:
     double laser_angle_max_;                        //!< maximum angle of the LiDAR
     double laser_angle_increment_;                  //!< increment between readings within a LiDAR scan
     double angle_error_adjustment_;                 //!< used to expand the angles provided from bounding boxes
+    double max_lidar_range_;
     
     prop_mapper::PropAngleRange prop_angles_msg_; //!< prop angles message from bounding boxes
     sensor_msgs::LaserScan scan_msg_;              
@@ -265,11 +267,15 @@ private:
 
 
         // Publish Message
-        prop_mapper::PropPolarCoords prop_rel_coords_msg;
-        prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
-        prop_rel_coords_msg.radius = closest_distance; 
-        prop_rel_coords_msg.angle = closest_angle; 
-        pub_prop_polar_coords_.publish(prop_rel_coords_msg);
+
+        if (closest_distance < max_lidar_range_)
+        {
+            prop_mapper::PropPolarCoords prop_rel_coords_msg;
+            prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
+            prop_rel_coords_msg.radius = closest_distance; 
+            prop_rel_coords_msg.angle = closest_angle; 
+            pub_prop_polar_coords_.publish(prop_rel_coords_msg);
+        }
     }
 
 };
