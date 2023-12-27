@@ -4,10 +4,12 @@
 
 class PropMapping {
 public:
-    PropMapping()
+    PropMapping(): nh_(""), private_nh_("~")
     {
         // get ROS parameters
         private_nh_.param<double>("mapping_safety_radius", safety_radius_, 1.0);
+
+        ROS_INFO("Loaded mapping_safety_radius parameter: %f", safety_radius_);
        
         prop_sub_ = nh_.subscribe("/completed_props", 1, &PropMapping::propCallback, this);
         prop_pub_ = nh_.advertise<prop_mapper::PropArray>("/prop_array", 1);
@@ -56,6 +58,7 @@ private:
          ROS_DEBUG_STREAM(TAG << "Banana");
         //use safety ranges to decide if prop is already in array
         bool propExists = false;
+        
         for (int i = 0; i < prop_array.props.size(); i++) {
             prop_mapper::Prop checkprop = prop_array.props[i];
             ROS_DEBUG_STREAM(TAG << "Checkprop x = " << checkprop.vector.x);

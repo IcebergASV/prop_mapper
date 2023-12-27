@@ -14,7 +14,7 @@
 */
 class CoordFinder {
 public:
-    CoordFinder()
+    CoordFinder() : nh_(""), private_nh_("~")
     {
         
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
@@ -128,7 +128,7 @@ private:
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "coord_finder_node");
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
         ros::console::notifyLoggerLevelsChanged();
     CoordFinder coord_finder;
     coord_finder.spin();
