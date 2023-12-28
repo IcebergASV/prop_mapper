@@ -10,7 +10,7 @@
  *
  * Set object_detection to false to run this node. 
  */
-void mock_marker_angles(std::string label, double theta_small, double theta_large) {
+void mock_marker_angles() {
     ros::NodeHandle nh("");
     ros::NodeHandle private_nh_("~");
 
@@ -18,14 +18,20 @@ void mock_marker_angles(std::string label, double theta_small, double theta_larg
     ros::Rate rate(10); // 10 Hz
     prop_mapper::PropAngleRange msg;
 
-    // Message
-    msg.prop_label = label;
-    msg.theta_small = theta_small; 
-    msg.theta_large = theta_large;
-
-    while (ros::ok()) {
-        ROS_DEBUG_STREAM(msg);
+    while (ros::ok()) 
+    {
+        msg.prop_label = "red_marker";
+        msg.theta_small = M_PI/2; 
+        msg.theta_large = M_PI;
         pub.publish(msg);
+        
+        rate.sleep(); 
+        
+        msg.prop_label = "green_marker";
+        msg.theta_small = 0.0; 
+        msg.theta_large = M_PI/2;
+        pub.publish(msg);
+
         rate.sleep();
     }
 }
@@ -35,8 +41,7 @@ int main(int argc, char** argv) {
     if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Warn))
     ros::console::notifyLoggerLevelsChanged();
     try {
-        mock_marker_angles("red_marker", 0.0, M_PI/2);
-        mock_marker_angles("green_marker", M_PI/2, M_PI);
+        mock_marker_angles();
     }
     catch (ros::Exception& e) {
         ROS_ERROR_STREAM("An exception occurred in the fake_angle_finder node: " << e.what());

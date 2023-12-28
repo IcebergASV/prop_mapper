@@ -202,6 +202,7 @@ private:
     void propCallback(const prop_mapper::PropAngleRange::ConstPtr& msg) {
         // save the PropAngleRange message for later use
         prop_angles_msg_ = *msg;
+        ROS_DEBUG_STREAM(TAG << "Prop: " << prop_angles_msg_.prop_label);
         ROS_DEBUG_STREAM(TAG << "Received PropInProgress message with theta_small=" << prop_angles_msg_.theta_small << " and theta_large=" << prop_angles_msg_.theta_large);
     }
 
@@ -253,7 +254,6 @@ private:
         for (int i = index1; i <= index2; i++) {
 
             selected_points.push_back(scanPoints[i]);
-            ROS_DEBUG_STREAM(TAG << "Pushing back points within camera range: " << scanPoints[i]);
         }
         if (selected_points.size()<1){
             ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
@@ -281,7 +281,7 @@ private:
 };
 int main(int argc, char** argv) {
     ros::init(argc, argv, "distance_finder");
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Warn))
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
         ros::console::notifyLoggerLevelsChanged();
     DistanceFinder distance_finder;
 

@@ -82,7 +82,7 @@ private:
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "prop_mapping_node");
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug))
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
         ros::console::notifyLoggerLevelsChanged();
     PropMapping prop_mapper;
     prop_mapper.spin();

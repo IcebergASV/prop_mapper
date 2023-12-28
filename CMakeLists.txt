@@ -169,6 +169,10 @@ add_executable(prop_map src/prop_map.cpp)
 target_link_libraries(prop_map ${catkin_LIBRARIES})
 add_dependencies(prop_map ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
+add_executable(mock_angle_finder_nav_channel src/mock_angle_finder_nav_channel.cpp)
+target_link_libraries(mock_angle_finder_nav_channel ${catkin_LIBRARIES})
+add_dependencies(mock_angle_finder_nav_channel ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(distance_finder
   liblidar_point
