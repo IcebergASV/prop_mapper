@@ -15,3 +15,6 @@ mapping_safety_radius: 3.0
 theta_1: 0.01 #radians
 theta_2: 3.14 #radians
 
+# Position of Lidar from boat center 
+lidar_position: 1.6 # meters
+

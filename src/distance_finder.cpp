@@ -37,6 +37,7 @@ public:
         // get ROS parameters
         private_nh_.param<double>("angle_error_adjustment", angle_error_adjustment_, 0.0);
         private_nh_.param<double>("max_lidar_range", max_lidar_range_, 29.0);
+        private_nh_.param<double>("lidar_position", lidar_position_, 1.6);
 
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
         private_nh_.param<std::string>("prop_topic", prop_angles_topic_, "/prop_angle_range");
@@ -74,6 +75,7 @@ private:
     double laser_angle_increment_;                  //!< increment between readings within a LiDAR scan
     double angle_error_adjustment_;                 //!< used to expand the angles provided from bounding boxes
     double max_lidar_range_;
+    double lidar_position_;
     
     prop_mapper::PropAngleRange prop_angles_msg_; //!< prop angles message from bounding boxes
     sensor_msgs::LaserScan scan_msg_;              
@@ -202,6 +204,7 @@ private:
     void propCallback(const prop_mapper::PropAngleRange::ConstPtr& msg) {
         // save the PropAngleRange message for later use
         prop_angles_msg_ = *msg;
+        ROS_DEBUG_STREAM(TAG << "Prop: " << prop_angles_msg_.prop_label);
         ROS_DEBUG_STREAM(TAG << "Received PropInProgress message with theta_small=" << prop_angles_msg_.theta_small << " and theta_large=" << prop_angles_msg_.theta_large);
     }
 
@@ -253,7 +256,6 @@ private:
         for (int i = index1; i <= index2; i++) {
 
             selected_points.push_back(scanPoints[i]);
-            ROS_DEBUG_STREAM(TAG << "Pushing back points within camera range: " << scanPoints[i]);
         }
         if (selected_points.size()<1){
             ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
@@ -272,7 +274,7 @@ private:
         {
             prop_mapper::PropPolarCoords prop_rel_coords_msg;
             prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
-            prop_rel_coords_msg.radius = closest_distance; 
+            prop_rel_coords_msg.radius = closest_distance + lidar_position_; 
             prop_rel_coords_msg.angle = closest_angle; 
             pub_prop_polar_coords_.publish(prop_rel_coords_msg);
         }
@@ -281,7 +283,7 @@ private:
 };
 int main(int argc, char** argv) {
     ros::init(argc, argv, "distance_finder");
-    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Warn))
+    if (ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info))
         ros::console::notifyLoggerLevelsChanged();
     DistanceFinder distance_finder;
 
