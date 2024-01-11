@@ -1,21 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-  <!--Launch file for sim-->
+  <!--Launch file for real life-->
 
-  <node name="fake_angle_finder" pkg="prop_mapper" type="fake_angle_finder" output="log">
+  <!-- Arguments -->
+  <arg name="nav_channel_without_yolo" default="true"/>
+
+  <!-- Nodes -->
+  <node name="mock_angle_finder_nav_channel" pkg="prop_mapper" type="mock_angle_finder_nav_channel" output="screen" if="$(arg nav_channel_without_yolo)">
     <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
   </node>
 
-  <node name="distance_finder" pkg="prop_mapper" type="distance_finder" output="log">
+  <node name="fake_angle_finder" pkg="prop_mapper" type="fake_angle_finder" output="screen" unless="$(arg nav_channel_without_yolo)">
     <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
   </node>
 
-  <node name="coord_finder" pkg="prop_mapper" type="coord_finder" output="log">
+  <node name="distance_finder" pkg="prop_mapper" type="distance_finder" output="screen">
     <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
   </node>
 
-  <!--node name="prop_map" pkg="prop_mapper" type="prop_map" output="log">
+  <node name="coord_finder" pkg="prop_mapper" type="coord_finder" output="screen">
     <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
-  </node-->
+  </node>
+
+  <node name="prop_map" pkg="prop_mapper" type="prop_map" output="screen">
+    <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
+  </node>
 
 </launch>
