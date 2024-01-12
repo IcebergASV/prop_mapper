@@ -4,7 +4,7 @@
 
 class PropMapping {
 public:
-    PropMapping(): nh_(""), private_nh_("~")
+    PropMapping(): nh_(""), private_nh_("~"), prop_count_(0)
     {
         // get ROS parameters
         private_nh_.param<double>("mapping_safety_radius", safety_radius_, 1.0);
@@ -32,6 +32,8 @@ private:
     ros::Publisher prop_pub_;
     prop_mapper::PropArray prop_array;
 
+    int prop_count_; //!< used to track prop count and create IDs
+
     std::string TAG = "PROP_MAP: ";          //!< tag for logging and debug messages
 
     double safety_radius_;
@@ -44,6 +46,8 @@ private:
         //make sure prop is not already in array
         if (isPropInArray(prop) == false){
             // add prop to array if not already there
+            prop.id = prop_count_;
+            prop_count_++;
             prop_array.props.push_back(prop);
             ROS_INFO_STREAM(TAG << "Added a Prop to the map");
         }
