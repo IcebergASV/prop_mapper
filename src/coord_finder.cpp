@@ -68,13 +68,7 @@ private:
         double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
         double yaw = std::atan2(siny_cosp, cosy_cosp);
 
-        // convert to gazebo heading
-        double heading = yaw - (M_PI/2);
-        if (heading < 0)
-        {
-            heading = heading + (2*M_PI);
-        }
-        return heading;
+        return yaw;
     }
 
     /**
@@ -107,8 +101,8 @@ private:
         double prop_y_aligned = radius*sin(angle-((M_PI/2)-heading));
 
 
-        double prop_x =  pose_msg_.pose.position.y + prop_x_aligned;
-        double prop_y =  -pose_msg_.pose.position.x + prop_y_aligned;
+        double prop_x =  pose_msg_.pose.position.x + prop_x_aligned;
+        double prop_y =  pose_msg_.pose.position.y + prop_y_aligned;
 
         // Create and publish the Prop message with the prop's local coordinates 
         prop_mapper::Prop local_prop_msg;
