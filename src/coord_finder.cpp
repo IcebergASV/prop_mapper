@@ -51,16 +51,6 @@ private:
 
     geometry_msgs::PoseStamped pose_msg_;
 
-    geometry_msgs::Vector3 getLocalCoords()
-    {
-        // Case 1: 0 < heading < 90 && prop in first relative coordinate
-        geometry_msgs::Vector3 local_coords;
-
-
-
-        return local_coords;
-    }
-
     double getGazeboHeading(const geometry_msgs::Quaternion q)
     {
         // yaw (z-axis rotation)
@@ -107,8 +97,8 @@ private:
         // Create and publish the Prop message with the prop's local coordinates 
         prop_mapper::Prop local_prop_msg;
         local_prop_msg.prop_label = msg->prop_label;
-        local_prop_msg.vector.x = prop_x;
-        local_prop_msg.vector.y = prop_y;
+        local_prop_msg.point.x = prop_x;
+        local_prop_msg.point.y = prop_y;
 
         ROS_DEBUG_STREAM(TAG << "x robot = " << pose_msg_.pose.position.y);
         ROS_DEBUG_STREAM(TAG << "y robot = " << -pose_msg_.pose.position.x);
