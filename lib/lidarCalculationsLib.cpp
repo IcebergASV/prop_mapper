@@ -23,5 +23,7 @@ double calculateRadius(const std::vector<lidarPoint>& points, int min_pts) {
     // follow gpt's solution for solving the matrices using Eigen
     // break it down into smaller helper functions
 
+    // look into being behind on version for prop_mapper
+
     return radius;
 }
