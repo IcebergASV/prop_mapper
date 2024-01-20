@@ -133,6 +133,10 @@ add_library(liblidar_point
   lib/lidar_point.cpp
 )
 
+add_library(liblidar_calc
+  lib/lidar_calculations.cpp
+)
+
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
@@ -173,9 +177,15 @@ add_executable(mock_angle_finder_nav_channel src/mock_angle_finder_nav_channel.c
 target_link_libraries(mock_angle_finder_nav_channel ${catkin_LIBRARIES})
 add_dependencies(mock_angle_finder_nav_channel ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
+### THE FOLLOWING LINES ADD THE LIDAR CALC TEST TO CMAKE
+# add_executable(lidar_calc_test test/lidar_calc_test.cpp)
+# target_link_libraries(lidar_calc_test liblidar_calc liblidar_point ${catkin_LIBRARIES})
+# add_dependencies(lidar_calc_test ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
 ## Specify libraries to link a library or executable target against
 target_link_libraries(distance_finder
   liblidar_point
+  liblidar_calc
 )
 
 #############
