@@ -51,16 +51,6 @@ private:
 
     geometry_msgs::PoseStamped pose_msg_;
 
-    geometry_msgs::Vector3 getLocalCoords()
-    {
-        // Case 1: 0 < heading < 90 && prop in first relative coordinate
-        geometry_msgs::Vector3 local_coords;
-
-
-
-        return local_coords;
-    }
-
     double getGazeboHeading(const geometry_msgs::Quaternion q)
     {
         // yaw (z-axis rotation)
@@ -68,13 +58,7 @@ private:
         double cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
         double yaw = std::atan2(siny_cosp, cosy_cosp);
 
-        // convert to gazebo heading
-        double heading = yaw - (M_PI/2);
-        if (heading < 0)
-        {
-            heading = heading + (2*M_PI);
-        }
-        return heading;
+        return yaw;
     }
 
     /**
@@ -107,14 +91,14 @@ private:
         double prop_y_aligned = radius*sin(angle-((M_PI/2)-heading));
 
 
-        double prop_x =  pose_msg_.pose.position.y + prop_x_aligned;
-        double prop_y =  -pose_msg_.pose.position.x + prop_y_aligned;
+        double prop_x =  pose_msg_.pose.position.x + prop_x_aligned;
+        double prop_y =  pose_msg_.pose.position.y + prop_y_aligned;
 
         // Create and publish the Prop message with the prop's local coordinates 
         prop_mapper::Prop local_prop_msg;
         local_prop_msg.prop_label = msg->prop_label;
-        local_prop_msg.vector.x = prop_x;
-        local_prop_msg.vector.y = prop_y;
+        local_prop_msg.point.x = prop_x;
+        local_prop_msg.point.y = prop_y;
 
         ROS_DEBUG_STREAM(TAG << "x robot = " << pose_msg_.pose.position.y);
         ROS_DEBUG_STREAM(TAG << "y robot = " << -pose_msg_.pose.position.x);

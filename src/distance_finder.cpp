@@ -2,7 +2,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <prop_mapper/PropAngleRange.h>
 #include <prop_mapper/PropPolarCoords.h>
-#include <geometry_msgs/Vector3.h>
 #include <cmath>
 #include <vector>
 #include <stdexcept>
