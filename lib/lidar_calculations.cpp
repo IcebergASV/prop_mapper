@@ -5,12 +5,10 @@
 #include "lidar_point.h"
 #include <eigen3/Eigen/Dense>
 
-// Default constructor
-lidarCalculations::lidarCalculations() {}
 
 double lidarCalculations::calculateRadius(const std::vector<lidarPoint>& points, int min_pts) const {
     if (points.size() < min_pts) {
-        ROS_WARN("At least 6 points are required to calculate the radius of a cylinder.");
+        ROS_WARN_STREAM("At least " << min_pts << " points are required to calculate the radius of a cylinder.");
     }
 
     // convert polar coordinates to cartesian coordinates
@@ -31,11 +29,8 @@ double lidarCalculations::calculateRadius(const std::vector<lidarPoint>& points,
         mA_11 = mA_11 + pow(x_coords[i], 2);
         mA_12 = mA_12 + (x_coords[i]*y_coords[i]);
         mA_13 = mA_13 + x_coords[i];
-        // mA_21 = mA_12
         mA_22 = mA_22 + pow(y_coords[i], 2);
         mA_23 = mA_23 + y_coords[i];
-        // mA_31 = mA_13
-        // mA_32 = mA_23
     }
     mA_21 = mA_12;
     mA_31 = mA_13;
