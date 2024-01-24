@@ -10,7 +10,11 @@
     <rosparam file="$(find prop_mapper)/config/sim_params.yaml" command="load" />
   </node>
 
-  <node name="fake_angle_finder" pkg="prop_mapper" type="fake_angle_finder" output="screen" unless="$(arg nav_channel_without_yolo)">
+  <!--node name="fake_angle_finder" pkg="prop_mapper" type="fake_angle_finder" output="screen" if="$(arg nav_channel_without_yolo)">
+    <rosparam file="$(find prop_mapper)/config/sim_params.yaml" command="load" />
+  </node-->
+
+  <node name="angle_finder" pkg="prop_mapper" type="angle_finder" output="screen" unless="$(arg nav_channel_without_yolo)">
     <rosparam file="$(find prop_mapper)/config/sim_params.yaml" command="load" />
   </node>
 
