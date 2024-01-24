@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="prop_mapper" type="lidar_calc_test" name="lidar_calc_test" output="screen"></node>
+</launch>
