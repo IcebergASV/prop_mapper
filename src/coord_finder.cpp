@@ -75,6 +75,7 @@ private:
     */
     void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
+        ROS_DEBUG_STREAM(TAG << "poseCallback() called");
         // check that the prop msg has been set before publishing a prop
         if (isValidLabel(prop_msg_.prop_label))
         {
@@ -123,6 +124,7 @@ private:
     */
     void propCallback(const prop_mapper::PropPolarCoords::ConstPtr& msg)
     {
+        ROS_DEBUG_STREAM(TAG << "propCallback() called");
         prop_msg_ = *msg;
     }
 
