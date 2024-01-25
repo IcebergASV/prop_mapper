@@ -5,6 +5,7 @@
 #include "lidar_point.h"
 #include <eigen3/Eigen/Dense>
 
+lidarCalculations::lidarCalculations() {}
 
 double lidarCalculations::calculateRadius(const std::vector<lidarPoint>& points, int min_pts) const {
     if (points.size() < min_pts) {
