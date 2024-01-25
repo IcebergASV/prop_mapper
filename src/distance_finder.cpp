@@ -281,22 +281,26 @@ private:
 
         // get all points on the circle, points that fall within a distance of each other
         std::vector<lidarPoint> circle_points;
+        circle_points.push_back(lidarPoint(closest_distance, closest_angle));
         for (int i = 0; i < selected_points.size(); i++) {
             double i_dist = selected_points[i].getDistance();
             double i_angle = selected_points[i].getAngle();
-            double dist = sqrt(pow(i_dist, 2) + pow(closest_distance, 2) - 2*i_dist*closest_distance*cos(closest_angle - i_angle));
-            if (dist < lidar_point_range_) {
-                circle_points.push_back(selected_points[i]);
+            if (i_dist < max_lidar_range_) {
+                double dist = sqrt(pow(i_dist, 2) + pow(closest_distance, 2) - 2*i_dist*closest_distance*cos(closest_angle - i_angle));
+                if (dist < lidar_point_range_) {
+                    circle_points.push_back(selected_points[i]);
+                }
             }
         }
         if (circle_points.size()<min_circle_pts_) {
-            ROS_WARN_STREAM(TAG << "Expected at least " << min_circle_pts_ << "points for radius calculation but got " << circle_points.size());
+            ROS_WARN_STREAM(TAG << "Expected at least " << min_circle_pts_ << " points for radius calculation but got " << circle_points.size());
             return;
         }
 
         // do radius checking, and confirm that the prop found has the expected radius
         lidarCalculations lidarCalc;
         double radius = lidarCalc.calculateRadius(circle_points, min_circle_pts_);
+        ROS_INFO_STREAM("after radius calculation, radius = " << radius);
         if (!((radius > marker_radius_ - prop_range_  && radius < marker_radius_ + prop_range_ ) || (radius > sm_buoy_radius_ - prop_range_ && radius < sm_buoy_radius_ + prop_range_) || (radius > lg_buoy_radius_ - prop_range_ && radius < lg_buoy_radius_ + prop_range_))) {
             // if the prop doesn't fit a radius range, then it doesn't have a valid radius
             // to be more specific, get label for prop then specify what radius to compare to based on that
@@ -308,6 +312,7 @@ private:
 
         if (closest_distance < max_lidar_range_)
         {
+            ROS_INFO_STREAM("publishing to prop_polar_coords_");
             prop_mapper::PropPolarCoords prop_rel_coords_msg;
             prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
             prop_rel_coords_msg.radius = closest_distance + lidar_position_; 
