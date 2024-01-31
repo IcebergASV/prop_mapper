@@ -25,7 +25,7 @@ void fake_bbox_angles() {
     prop_mapper::PropAngleRange msg;
 
     // Message
-    msg.prop_label = "buoy";
+    msg.prop_label = "red_marker";
     msg.theta_small = theta_small; 
     msg.theta_large = theta_large;
 

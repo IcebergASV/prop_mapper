@@ -10,8 +10,7 @@ min_lidar_range: 0.1 #meters - should be slight larger than real, or accurate ra
 
 min_circle_pts: 6 # minimum number of points necessary for radius checking
 marker_radius: 0.127 #meters
-large_buoy_radius: 0.184 #meters
-small_buoy_radius: 0.1015 #meters
+buoy_radius: 0.495829 #meters - radius for red buoy in sim, TODO: adjust at comp
 prop_range: 0.05 #meters - acceptable range for prop radius (radius +/- prop_range)
 lidar_point_range: 0.3 #meters - how close points should be for radius checking
 
