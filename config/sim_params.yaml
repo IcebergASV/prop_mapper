@@ -8,7 +8,7 @@ angle_error_adjustment: 0.0 #radians TUNING
 max_lidar_range: 29 #meters - should be slightly less than real range, or accurate range 
 min_lidar_range: 0.1 #meters - should be slight larger than real, or accurate range
 
-min_circle_pts: 6 # minimum number of points necessary for radius checking
+min_circle_pts: 4 # minimum number of points necessary for radius checking
 marker_radius: 0.127 #meters
 buoy_radius: 0.495829 #meters - radius for red buoy in sim
 prop_range: 0.05 #meters - acceptable range for prop radius (radius +/- prop_range)
