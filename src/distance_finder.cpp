@@ -309,7 +309,7 @@ private:
         // do radius checking, and confirm that the prop found has the expected radius
         lidarCalculations lidarCalc;
         double radius = lidarCalc.calculateRadius(circle_points, min_circle_pts_p);
-        ROS_INFO_STREAM(TAG << "r = " << radius << ", close pt = " << closest_distance);
+        ROS_DEBUG_STREAM(TAG << "r = " << radius << ", close pt = " << closest_distance);
         // TODO: change below radius validation so that we only compare against the correct prop type
         if (!((radius > marker_radius_p - prop_range_p  && radius < marker_radius_p + prop_range_p ) || (radius > buoy_radius_p - prop_range_p && radius < buoy_radius_p + prop_range_p))) {
             // if the prop doesn't fit a radius range, then it doesn't have a valid radius
@@ -324,7 +324,7 @@ private:
         {
             prop_mapper::PropPolarCoords prop_rel_coords_msg;
             prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
-            prop_rel_coords_msg.radius = radius ; 
+            prop_rel_coords_msg.radius = radius + closest_distance; 
             prop_rel_coords_msg.angle = closest_angle; 
             pub_prop_polar_coords_.publish(prop_rel_coords_msg);
         }
