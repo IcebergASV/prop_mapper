@@ -5,6 +5,7 @@
 #include "lidar_point.h"
 #include <eigen3/Eigen/Dense>
 
+lidarCalculations::lidarCalculations() {}
 
 double lidarCalculations::calculateRadius(const std::vector<lidarPoint>& points, int min_pts) const {
     if (points.size() < min_pts) {
@@ -57,6 +58,7 @@ double lidarCalculations::calculateRadius(const std::vector<lidarPoint>& points,
     ROS_DEBUG_STREAM("C: " << result[2]);
 
     radius = (sqrt(4*result[2] + pow(result[0], 2) + pow(result[1], 2))) / 2;
+    ROS_DEBUG_STREAM("LIDAR_CALC: Radius = " << radius);
 
     return radius;
 }

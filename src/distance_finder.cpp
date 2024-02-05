@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 #include <ros/console.h>
+#include "lidar_calculations.h"
+#include <algorithm>
 
 /**
 * @brief Finds the relative local coordinates of the prop with the robot's current position as a reference
@@ -34,9 +36,15 @@ public:
     DistanceFinder() : nh_(""), private_nh_("~") {
         
         // get ROS parameters
-        private_nh_.param<double>("angle_error_adjustment", angle_error_adjustment_, 0.0);
-        private_nh_.param<double>("max_lidar_range", max_lidar_range_, 29.0);
-        private_nh_.param<double>("lidar_position", lidar_position_, 1.6);
+        private_nh_.param<double>("angle_error_adjustment", angle_error_adjustment_p, 0.0);
+        private_nh_.param<double>("max_lidar_range", max_lidar_range_p, 29.0);
+        private_nh_.param<double>("lidar_position", lidar_position_p, 1.6);
+        private_nh_.param<int>("min_circle_pts", min_circle_pts_p, 6);
+        private_nh_.param<double>("marker_radius", marker_radius_p, 0.127);
+        private_nh_.param<double>("buoy_radius", buoy_radius_p, 0.495829);
+        private_nh_.param<double>("prop_range", prop_range_p, 0.05);
+        private_nh_.param<double>("lidar_point_range", lidar_point_range_p, 0.3);
+        private_nh_.getParam("valid_prop_labels", valid_prop_labels_p);
 
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
         private_nh_.param<std::string>("prop_topic", prop_angles_topic_, "/prop_angle_range");
@@ -72,9 +80,15 @@ private:
     double laser_angle_min_;                        //!< minimum angle of the LiDAR
     double laser_angle_max_;                        //!< maximum angle of the LiDAR
     double laser_angle_increment_;                  //!< increment between readings within a LiDAR scan
-    double angle_error_adjustment_;                 //!< used to expand the angles provided from bounding boxes
-    double max_lidar_range_;
-    double lidar_position_;
+    double angle_error_adjustment_p;                 //!< used to expand the angles provided from bounding boxes
+    double max_lidar_range_p;
+    double lidar_position_p;
+    int min_circle_pts_p;
+    double marker_radius_p;
+    double buoy_radius_p;
+    double prop_range_p;
+    double lidar_point_range_p;
+    std::vector<std::string> valid_prop_labels_p;
     
     prop_mapper::PropAngleRange prop_angles_msg_; //!< prop angles message from bounding boxes
     sensor_msgs::LaserScan scan_msg_;              
@@ -95,19 +109,28 @@ private:
     {
         bool valid_msg = true;
 
-        if (msg.prop_label.empty()) {
-            ROS_WARN_STREAM(TAG << "Invalid PropInProgress message received - Prop type is empty");
+        if (!isLabelValid(msg)) { // if label not in valid labels
+            ROS_WARN_STREAM(TAG << "Invalid Prop message received - Prop type is invalid");
             valid_msg = false;
         }
         if (std::isnan(msg.theta_small)) {
-            ROS_WARN_STREAM(TAG << "Invalid PropInProgress message received - theta 1 is empty");
+            ROS_WARN_STREAM(TAG << "Invalid Prop message received - theta 1 is empty");
             valid_msg = false;
         }
         if (std::isnan(msg.theta_large)) {
-            ROS_WARN_STREAM(TAG << "Invalid PropInProgress message received - theta 2 is empty");
+            ROS_WARN_STREAM(TAG << "Invalid Prop message received - theta 2 is empty");
             valid_msg = false;
         }
         return valid_msg;
+    }
+
+    bool isLabelValid(const prop_mapper::PropAngleRange prop) {
+        for (int i = 0; i < valid_prop_labels_p.size(); i++) {
+            if (valid_prop_labels_p[i] == prop.prop_label) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -233,8 +256,8 @@ private:
         }
 
         //add a safety range onto the bounding box angles
-        double index1_angle = prop_angles_msg_.theta_small + angle_error_adjustment_;
-        double index2_angle = prop_angles_msg_.theta_large - angle_error_adjustment_;
+        double index1_angle = prop_angles_msg_.theta_small + angle_error_adjustment_p;
+        double index2_angle = prop_angles_msg_.theta_large - angle_error_adjustment_p;
 
         // calculate the range indexes for the given theta angles
         int index1;
@@ -253,8 +276,9 @@ private:
         //create a smaller vector of only points within the camera provided range
         std::vector<lidarPoint> selected_points;
         for (int i = index1; i <= index2; i++) {
-
-            selected_points.push_back(scanPoints[i]);
+            if (scanPoints[i].getDistance() < max_lidar_range_p) {
+                selected_points.push_back(scanPoints[i]);
+            }
         }
         if (selected_points.size()<1){
             ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
@@ -266,14 +290,41 @@ private:
         double closest_angle;
         getClosestObject(selected_points, closest_distance, closest_angle);
 
+        // get all points on the circle, points that fall within a distance of each other
+        std::vector<lidarPoint> circle_points;
+        circle_points.push_back(lidarPoint(closest_distance, closest_angle));
+        for (int i = 0; i < selected_points.size(); i++) {
+            double i_dist = selected_points[i].getDistance();
+            double i_angle = selected_points[i].getAngle();
+            double dist = sqrt(pow(i_dist, 2) + pow(closest_distance, 2) - 2*i_dist*closest_distance*cos(closest_angle - i_angle));
+            if (dist < lidar_point_range_p) {
+                circle_points.push_back(selected_points[i]);
+            }
+        }
+        if (circle_points.size()<min_circle_pts_p) {
+            ROS_WARN_STREAM(TAG << "Expected at least " << min_circle_pts_p << " points for radius calculation but got " << circle_points.size());
+            return;
+        }
+
+        // do radius checking, and confirm that the prop found has the expected radius
+        lidarCalculations lidarCalc;
+        double radius = lidarCalc.calculateRadius(circle_points, min_circle_pts_p);
+        ROS_INFO_STREAM(TAG << "r = " << radius << ", close pt = " << closest_distance);
+        // TODO: change below radius validation so that we only compare against the correct prop type
+        if (!((radius > marker_radius_p - prop_range_p  && radius < marker_radius_p + prop_range_p ) || (radius > buoy_radius_p - prop_range_p && radius < buoy_radius_p + prop_range_p))) {
+            // if the prop doesn't fit a radius range, then it doesn't have a valid radius
+            // to be more specific, get label for prop then specify what radius to compare to based on that
+            ROS_WARN_STREAM(TAG << "Calculated radius does not match the expected radius");
+            return;
+        }
 
         // Publish Message
 
-        if (closest_distance < max_lidar_range_)
+        if (closest_distance < max_lidar_range_p)
         {
             prop_mapper::PropPolarCoords prop_rel_coords_msg;
             prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
-            prop_rel_coords_msg.radius = closest_distance + lidar_position_; 
+            prop_rel_coords_msg.radius = radius ; 
             prop_rel_coords_msg.angle = closest_angle; 
             pub_prop_polar_coords_.publish(prop_rel_coords_msg);
         }
