@@ -324,7 +324,7 @@ private:
         {
             prop_mapper::PropPolarCoords prop_rel_coords_msg;
             prop_rel_coords_msg.prop_label = prop_angles_msg_.prop_label;
-            prop_rel_coords_msg.radius = closest_distance + lidar_position_p; 
+            prop_rel_coords_msg.radius = radius ; 
             prop_rel_coords_msg.angle = closest_angle; 
             pub_prop_polar_coords_.publish(prop_rel_coords_msg);
         }
