@@ -41,8 +41,11 @@ public:
         private_nh_.param<double>("lidar_position", lidar_position_p, 1.6);
         private_nh_.param<int>("min_circle_pts", min_circle_pts_p, 6);
         private_nh_.param<double>("marker_radius", marker_radius_p, 0.127);
-        private_nh_.param<double>("buoy_radius", buoy_radius_p, 0.495829);
-        private_nh_.param<double>("prop_range", prop_range_p, 0.05);
+        private_nh_.param<double>("small_buoy_radius", buoy_radius_sm_p, 0.1015);
+        private_nh_.param<double>("large_buoy_radius", buoy_radius_lg_p, 0.184);
+        private_nh_.param<double>("marker_radius_range", marker_radius_range_p, 0.05);
+        private_nh_.param<double>("small_buoy_radius_range", buoy_sm_radius_range_p, 0.075);
+        private_nh_.param<double>("large_buoy_radius_range", buoy_lg_radius_range_p, 0.1);
         private_nh_.param<double>("lidar_point_range", lidar_point_range_p, 0.3);
         private_nh_.getParam("valid_prop_labels", valid_prop_labels_p);
 
@@ -85,8 +88,11 @@ private:
     double lidar_position_p;
     int min_circle_pts_p;
     double marker_radius_p;
-    double buoy_radius_p;
-    double prop_range_p;
+    double buoy_radius_sm_p;
+    double buoy_radius_lg_p;
+    double marker_radius_range_p;
+    double buoy_sm_radius_range_p;
+    double buoy_lg_radius_range_p;
     double lidar_point_range_p;
     std::vector<std::string> valid_prop_labels_p;
     
@@ -311,11 +317,45 @@ private:
         double radius = lidarCalc.calculateRadius(circle_points, min_circle_pts_p);
         ROS_DEBUG_STREAM(TAG << "r = " << radius << ", close pt = " << closest_distance);
         // TODO: change below radius validation so that we only compare against the correct prop type
-        if (!((radius > marker_radius_p - prop_range_p  && radius < marker_radius_p + prop_range_p ) || (radius > buoy_radius_p - prop_range_p && radius < buoy_radius_p + prop_range_p))) {
-            // if the prop doesn't fit a radius range, then it doesn't have a valid radius
-            // to be more specific, get label for prop then specify what radius to compare to based on that
-            ROS_WARN_STREAM(TAG << "Calculated radius does not match the expected radius");
-            return;
+        if (prop_angles_msg_.prop_label == "red_marker" || prop_angles_msg_.prop_label == "green_marker") {
+            if (!(radius > marker_radius_p - marker_radius_range_p  && radius < marker_radius_p + marker_radius_range_p)) {
+                ROS_WARN_STREAM(TAG << "Calculated radius does not match marker radius");
+                return;
+            }
+        }
+        else if (prop_angles_msg_.prop_label == "blue_buoy" || prop_angles_msg_.prop_label == "yellow_buoy") {
+            if (!(radius > buoy_radius_lg_p - buoy_lg_radius_range_p && radius < buoy_radius_lg_p + buoy_lg_radius_range_p)) {
+                ROS_WARN_STREAM(TAG << "Calculated radius does not match large buoy radius");
+                return;
+            }
+        }
+        else if (prop_angles_msg_.prop_label == "red_buoy") {
+            // compare radius to set large or small
+            if ((radius > buoy_radius_lg_p - buoy_lg_radius_range_p && radius < buoy_radius_lg_p + buoy_lg_radius_range_p)) {
+                // within large rad
+                prop_angles_msg_.prop_label = "red_buoy_lg";
+            }
+            else if ((radius > buoy_radius_sm_p - buoy_sm_radius_range_p && radius < buoy_radius_sm_p + buoy_sm_radius_range_p)) {
+                prop_angles_msg_.prop_label = "red_buoy_sm";
+            }
+            else { // neither large or small
+                ROS_WARN_STREAM(TAG << "Calculated radius does not match large or small buoy radius");
+                return;
+            }
+        }
+        else if (prop_angles_msg_.prop_label == "green_buoy") {
+            // compare radius to set large or small
+            if ((radius > buoy_radius_lg_p - buoy_lg_radius_range_p && radius < buoy_radius_lg_p + buoy_lg_radius_range_p)) {
+                // within large rad
+                prop_angles_msg_.prop_label = "green_buoy_lg";
+            }
+            else if ((radius > buoy_radius_sm_p - buoy_sm_radius_range_p && radius < buoy_radius_sm_p + buoy_sm_radius_range_p)) {
+                prop_angles_msg_.prop_label = "green_buoy_sm";
+            }
+            else { // neither large or small
+                ROS_WARN_STREAM(TAG << "Calculated radius does not match large or small buoy radius");
+                return;
+            }
         }
 
         // Publish Message
