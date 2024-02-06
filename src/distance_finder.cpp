@@ -278,12 +278,15 @@ private:
         for (int i = index1; i <= index2; i++) {
             if (scanPoints[i].getDistance() < max_lidar_range_p) {
                 selected_points.push_back(scanPoints[i]);
+                ROS_DEBUG_STREAM(TAG << "lidar point inside bounding box- dist: " << scanPoints[i].getDistance() << "angle: " << scanPoints[i].getAngle() );
             }
         }
         if (selected_points.size()<1){
             ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
             return;
         }
+
+        
         
         // find the distance from the center of closest point and angle within the given range 
         double closest_distance;
