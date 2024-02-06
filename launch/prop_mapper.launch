@@ -3,7 +3,7 @@
   <!--Launch file for real life-->
 
   <!-- Arguments -->
-  <arg name="use_mock_angle_finder" default="true"/>
+  <arg name="use_mock_angle_finder" default="false"/>
 
   <!-- Nodes -->
 
