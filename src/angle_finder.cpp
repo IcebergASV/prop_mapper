@@ -31,12 +31,46 @@ public:
 
 private:
 
+    void onlyKeepClosestProps()
+    {
+
+    }
     void yoloCallback(const yolov5_ros_msgs::BoundingBoxes::ConstPtr& msg)
     {
+        ROS_INFO_STREAM(TAG << "yoloCallback");
         std::vector<yolov5_ros_msgs::BoundingBox> boundingBoxes;
         boundingBoxes.assign(msg->bounding_boxes.begin(), msg->bounding_boxes.end());
 
-        for (yolov5_ros_msgs::BoundingBox box : boundingBoxes)
+        std::vector<yolov5_ros_msgs::BoundingBox> closestBoundingBoxes;
+
+        for (int i = 0; i < boundingBoxes.size(); i++)
+        {
+            bool already_exists = false;
+            int box_width = boundingBoxes[i].xmax - boundingBoxes[i].xmin;
+            for (int j = 0; j < closestBoundingBoxes.size(); j++)
+            {
+                if (boundingBoxes[i].Class == closestBoundingBoxes[j].Class)
+                {
+                    ROS_INFO_STREAM(TAG << "box type: " << boundingBoxes[i].Class<< " already in frame");
+                    already_exists = true;
+                    int closest_box_width = closestBoundingBoxes[j].xmax - closestBoundingBoxes[j].xmin;
+                    if ( box_width > closest_box_width )
+                    {
+                        ROS_INFO_STREAM(TAG << "current box: " << box_width <<  " larger than exsisting box: " << closest_box_width << " - replacing");
+                        closestBoundingBoxes.erase(closestBoundingBoxes.begin() + j);
+                        closestBoundingBoxes.push_back(boundingBoxes[i]);
+                    }
+                }
+            }
+            if (!already_exists)
+            {
+                ROS_INFO_STREAM(TAG << "Adding " << boundingBoxes[i].Class << " with width: " << box_width);
+                closestBoundingBoxes.push_back(boundingBoxes[i]);
+            }
+        }
+        
+
+        for (yolov5_ros_msgs::BoundingBox box : closestBoundingBoxes)
         {
             if (box.probability >= min_detection_probability_p)
             {   
@@ -56,7 +90,7 @@ private:
                 prop_pub_.publish(prop_msg);
             }
             else 
-                ROS_DEBUG_STREAM(TAG << "Prop: " << box.Class << ", probability to low: " << box.probability );
+                ROS_DEBUG_STREAM(TAG << "Prop: " << box.Class << ", probability too low: " << box.probability );
         }
     }
     

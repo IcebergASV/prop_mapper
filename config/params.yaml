@@ -26,4 +26,3 @@ theta_2: 3.14 #radians
 
 # Position of Lidar from boat center 
 lidar_position: 0.245 # meters
-

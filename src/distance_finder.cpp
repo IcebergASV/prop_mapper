@@ -178,7 +178,7 @@ private:
             double distance = distances[i];
             lidarPoint point(distance, currentAngle);
             lidarPoints.push_back(point);
-
+            ROS_DEBUG_STREAM(TAG << "all lidar points dist: " << lidarPoints[i].getDistance() << " angle: " << lidarPoints[i].getAngle() );
             currentAngle += angle_increment;
         }
 
@@ -273,14 +273,31 @@ private:
             return;
         }
 
+
+        ROS_DEBUG_STREAM(TAG << "START BOX ARRAY");
         //create a smaller vector of only points within the camera provided range
         std::vector<lidarPoint> selected_points;
+
+
+        double min_angle = 100;
+        double max_angle = -100;
         for (int i = index1; i <= index2; i++) {
+            ROS_DEBUG_STREAM(TAG << "Checking point distance within box with angle: " << scanPoints[i].getAngle());
             if (scanPoints[i].getDistance() < max_lidar_range_p) {
                 selected_points.push_back(scanPoints[i]);
                 ROS_DEBUG_STREAM(TAG << "lidar point inside bounding box- dist: " << scanPoints[i].getDistance() << "angle: " << scanPoints[i].getAngle() );
+                if (scanPoints[i].getAngle() < min_angle)
+                {
+                    min_angle = scanPoints[i].getAngle();
+                }
+                else if (scanPoints[i].getAngle() > max_angle)
+                {
+                    max_angle = scanPoints[i].getAngle();
+                }
             }
         }
+        ROS_DEBUG_STREAM(TAG << "Looked for points in bounding box between " << min_angle << ", and " << max_angle << " rad");
+
         if (selected_points.size()<1){
             ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
             return;
