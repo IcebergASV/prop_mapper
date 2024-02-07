@@ -239,8 +239,11 @@ private:
     * */
     void scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
         
+        ROS_DEBUG_STREAM(TAG << "scanCallback");
         // save the scan message
         scan_msg_ = *msg;
+
+        ROS_DEBUG_STREAM(TAG << "Prop label: " << prop_angles_msg_.prop_label << ", min angle: " << prop_angles_msg_.theta_small << ", max angle: " << prop_angles_msg_.theta_large);
 
         // get LiDAR specs
         laser_angle_min_ = scan_msg_.angle_min;
