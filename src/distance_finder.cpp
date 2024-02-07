@@ -118,7 +118,7 @@ private:
         bool valid_msg = true;
 
         if (!isLabelValid(msg)) { // if label not in valid labels
-            ROS_WARN_STREAM(TAG << "Invalid Prop message received - Prop type is invalid");
+            ROS_DEBUG_STREAM(TAG << "Invalid Prop message received - Prop type is invalid");
             valid_msg = false;
         }
         if (std::isnan(msg.theta_small)) {
@@ -186,7 +186,7 @@ private:
 
         // check that the range indexes are within the range of the scan message and that index1 > index2
         if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size() || index1 >= index2) {
-            ROS_WARN_STREAM(TAG << "PropInProgress message range indexes are out of bounds for the given scan message");
+            ROS_DEBUG_STREAM(TAG << "PropInProgress message range indexes are out of bounds for the given scan message");
             return false;
         }
 
@@ -214,7 +214,7 @@ private:
             double distance = distances[i];
             lidarPoint point(distance, currentAngle);
             lidarPoints.push_back(point);
-
+            ROS_DEBUG_STREAM(TAG << "all lidar points dist: " << lidarPoints[i].getDistance() << " angle: " << lidarPoints[i].getAngle() );
             currentAngle += angle_increment;
         }
 
@@ -275,8 +275,11 @@ private:
     * */
     void scanCallback(const sensor_msgs::LaserScan::ConstPtr& msg) {
         
+        ROS_DEBUG_STREAM(TAG << "scanCallback");
         // save the scan message
         scan_msg_ = *msg;
+
+        ROS_DEBUG_STREAM(TAG << "Prop label: " << prop_angles_msg_.prop_label << ", min angle: " << prop_angles_msg_.theta_small << ", max angle: " << prop_angles_msg_.theta_large);
 
         // get LiDAR specs
         laser_angle_min_ = scan_msg_.angle_min;
@@ -309,17 +312,37 @@ private:
             return;
         }
 
+
+        ROS_DEBUG_STREAM(TAG << "START BOX ARRAY");
         //create a smaller vector of only points within the camera provided range
         std::vector<lidarPoint> selected_points;
+
+
+        double min_angle = 100;
+        double max_angle = -100;
         for (int i = index1; i <= index2; i++) {
+            ROS_DEBUG_STREAM(TAG << "Checking point distance within box with angle: " << scanPoints[i].getAngle());
             if (scanPoints[i].getDistance() < max_lidar_range_p) {
                 selected_points.push_back(scanPoints[i]);
+                ROS_DEBUG_STREAM(TAG << "lidar point inside bounding box- dist: " << scanPoints[i].getDistance() << "angle: " << scanPoints[i].getAngle() );
+                if (scanPoints[i].getAngle() < min_angle)
+                {
+                    min_angle = scanPoints[i].getAngle();
+                }
+                else if (scanPoints[i].getAngle() > max_angle)
+                {
+                    max_angle = scanPoints[i].getAngle();
+                }
             }
         }
+        ROS_DEBUG_STREAM(TAG << "Looked for points in bounding box between " << min_angle << ", and " << max_angle << " rad");
+
         if (selected_points.size()<1){
-            ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
+            ROS_DEBUG_STREAM(TAG << "No points added to vector containing points within camera range ");
             return;
         }
+
+        
         
         // find the distance from the center of closest point and angle within the given range 
         double closest_distance;
@@ -350,7 +373,9 @@ private:
         if (!validateRadius(prop_angles_msg_.prop_label, radius)) {
             ROS_WARN_STREAM(TAG << "Calculated radius does not match expected " << prop_angles_msg_.prop_label << " radius");
             return;
-        }
+        } 
+
+        ROS_INFO_STREAM(TAG << "Valid prop: " << prop_angles_msg_.prop_label << " with radius: " << radius << ", " << radius + closest_distance << "m away");
 
         // Publish Message
 
