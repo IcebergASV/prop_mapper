@@ -110,7 +110,7 @@ private:
         bool valid_msg = true;
 
         if (!isLabelValid(msg)) { // if label not in valid labels
-            ROS_WARN_STREAM(TAG << "Invalid Prop message received - Prop type is invalid");
+            ROS_DEBUG_STREAM(TAG << "Invalid Prop message received - Prop type is invalid");
             valid_msg = false;
         }
         if (std::isnan(msg.theta_small)) {
@@ -150,7 +150,7 @@ private:
 
         // check that the range indexes are within the range of the scan message and that index1 > index2
         if (index1 < 0 || index2 < 0 || index1 >= scan_msg.ranges.size() || index2 >= scan_msg.ranges.size() || index1 >= index2) {
-            ROS_WARN_STREAM(TAG << "PropInProgress message range indexes are out of bounds for the given scan message");
+            ROS_DEBUG_STREAM(TAG << "PropInProgress message range indexes are out of bounds for the given scan message");
             return false;
         }
 
@@ -302,7 +302,7 @@ private:
         ROS_DEBUG_STREAM(TAG << "Looked for points in bounding box between " << min_angle << ", and " << max_angle << " rad");
 
         if (selected_points.size()<1){
-            ROS_WARN_STREAM(TAG << "No points added to vector containing points within camera range ");
+            ROS_DEBUG_STREAM(TAG << "No points added to vector containing points within camera range ");
             return;
         }
 
@@ -337,9 +337,11 @@ private:
         if (!((radius > marker_radius_p - prop_range_p  && radius < marker_radius_p + prop_range_p ) || (radius > buoy_radius_p - prop_range_p && radius < buoy_radius_p + prop_range_p))) {
             // if the prop doesn't fit a radius range, then it doesn't have a valid radius
             // to be more specific, get label for prop then specify what radius to compare to based on that
-            ROS_WARN_STREAM(TAG << "Calculated radius does not match the expected radius");
+            ROS_DEBUG_STREAM(TAG << "Calculated radius: " << radius << " does not match the expected radius");
             return;
-        }
+        } 
+
+        ROS_INFO_STREAM(TAG << "Valid prop: " << prop_angles_msg_.prop_label << " with radius: " << radius << ", " << radius + closest_distance << "m away");
 
         // Publish Message
 
