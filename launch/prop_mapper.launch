@@ -33,7 +33,7 @@
     <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
   </node>
 
-  <node pkg="rosbag" type="record" name="iceberg" if="$(arg record_rosbag)"
+  <node pkg="rosbag" type="record" name="prop_mapper_record" if="$(arg record_rosbag)"
           args="record -o /home/icebergasv/roboboat_2024/rosbags/iceberg_code 
               /completed_props
               /prop_angle_range
