@@ -145,21 +145,23 @@ private:
         if ((prop_label == "red_marker" || prop_label == "green_marker") && (radius>marker_radius_p-marker_radius_range_p && radius<marker_radius_p+marker_radius_range_p)) {
             return true;
         }
-        if ((prop_label == "blue_buoy") && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
+        else if ((prop_label == "blue_buoy") && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
             return true;
         }
-        if ((prop_label == "black_buoy") && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
+        else if ((prop_label == "black_buoy") && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
             return true;
         }
-        if ((prop_label == "red_buoy" || prop_label == "green_buoy" || prop_label == "yellow_buoy")) {
+        else if ((prop_label == "red_buoy" || prop_label == "green_buoy" || prop_label == "yellow_buoy")) {
             if(!check_small_buoys_p && ((radius>(((buoy_radius_sm_p+buoy_radius_lg_p)/2)-buoy_lg_radius_range_p)) && (radius<(((buoy_radius_sm_p+buoy_radius_lg_p)/2)+buoy_lg_radius_range_p)))) {
                 return true;
             }
-            if (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p) {
+            else if (check_small_buoys_p && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
+                ROS_DEBUG_STREAM(TAG << "Label updated, old: " << prop_label << "; new: " << prop_label << "_lg");
                 prop_label.append("_lg");
                 return true;
             }
-            if (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p) {
+            else if (check_small_buoys_p && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
+                ROS_DEBUG_STREAM(TAG << "Label updated, old: " << prop_label << "; new: " << prop_label << "_sm");
                 prop_label.append("_sm");
                 return true;
             }
