@@ -325,7 +325,7 @@ private:
             }
         }
         if (circle_points.size()<min_circle_pts_p) {
-            ROS_WARN_STREAM(TAG << "Expected at least " << min_circle_pts_p << " points for radius calculation but got " << circle_points.size());
+            ROS_DEBUG_STREAM(TAG << "Expected at least " << min_circle_pts_p << " points for radius calculation but got " << circle_points.size());
             return;
         }
 
@@ -341,7 +341,7 @@ private:
             return;
         } 
 
-        ROS_INFO_STREAM(TAG << "Valid prop: " << prop_angles_msg_.prop_label << " with radius: " << radius << ", " << radius + closest_distance << "m away");
+        ROS_DEBUG_STREAM(TAG << "Valid prop: " << prop_angles_msg_.prop_label << " with radius: " << radius << ", " << radius + closest_distance << "m away");
 
         // Publish Message
 
