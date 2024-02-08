@@ -19,7 +19,7 @@ lidar_point_range: 0.3 #meters - how close points should be for radius checking
 valid_prop_labels: ["red_marker", "green_marker", "yellow_buoy", "blue_buoy", "green_buoy", "red_buoy"] # valid labels for props
 
 # prop map
-mapping_safety_radius: 1.0
+mapping_safety_radius: 3.0
 
 # fake_angle_finder
 theta_1: 0.01 #radians
