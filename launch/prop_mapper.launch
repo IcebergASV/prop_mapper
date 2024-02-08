@@ -4,6 +4,7 @@
 
   <!-- Arguments -->
   <arg name="use_mock_angle_finder" default="false"/>
+  <arg name="record_rosbag" default="true"/>
 
   <!-- Nodes -->
 
@@ -32,7 +33,7 @@
     <rosparam file="$(find prop_mapper)/config/params.yaml" command="load" />
   </node>
 
-  <node pkg="rosbag" type="record" name="iceberg"
+  <node pkg="rosbag" type="record" name="iceberg" if="$(arg record_rosbag)"
           args="record -o /home/icebergasv/roboboat_2024/rosbags/iceberg_code 
               /completed_props
               /prop_angle_range
