@@ -3,7 +3,7 @@
   <!--Launch file for sim-->
 
   <!-- Arguments -->
-  <arg name="use_mock_angle_finder" default="false"/>
+  <arg name="use_mock_angle_finder" default="true"/>
 
   <!-- Nodes -->
 
