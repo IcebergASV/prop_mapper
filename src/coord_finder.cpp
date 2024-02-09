@@ -20,6 +20,8 @@ public:
         // Specify ROS topic names - using parameters for this so that we can change names from launch files
         private_nh_.param<std::string>("prop_topic", prop_distances_topic_, "/prop_polar_coords");
         private_nh_.param<std::string>("local_pose_topic", local_pose_topic_, "/mavros/local_position/pose");
+
+        private_nh_.getParam("valid_prop_labels", valid_prop_labels_p);
         
         // set up subscribers
         sub_pose_ = nh_.subscribe(local_pose_topic_, 1, &CoordFinder::poseCallback, this);
@@ -52,12 +54,13 @@ private:
     geometry_msgs::PoseStamped pose_msg_;
     prop_mapper::PropPolarCoords prop_msg_;
 
+    std::vector<std::string> valid_prop_labels_p;
+
     bool isValidLabel(std::string label)
     {
-        std::vector<std::string> prop_labels = {"red_marker", "green_marker", "red_buoy", "green_buoy", "yellow_buoy", "blue_buoy", "black_buoy"}; // TODO update with all props
-        auto it = std::find(prop_labels.begin(), prop_labels.end(), label);
+        auto it = std::find(valid_prop_labels_p.begin(), valid_prop_labels_p.end(), label);
 
-        return it != prop_labels.end();
+        return it != valid_prop_labels_p.end();
     }
 
     double getGazeboHeading(const geometry_msgs::Quaternion q)

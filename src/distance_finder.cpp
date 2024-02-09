@@ -166,6 +166,9 @@ private:
                 return true;
             }
         }
+        else if ((prop_label == "buoy") && ((radius>(((buoy_radius_sm_p+buoy_radius_lg_p)/2)-buoy_lg_radius_range_p)) && (radius<(((buoy_radius_sm_p+buoy_radius_lg_p)/2)+buoy_lg_radius_range_p)))) {
+            return true;
+        }
         else { // prop did not match an expected radius
             ROS_WARN_STREAM(TAG << "Calculated radius does not match expected " << prop_angles_msg_.prop_label << " radius, calculated radius = " << radius);
             return false;
