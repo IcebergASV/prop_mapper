@@ -167,7 +167,7 @@ private:
             }
         }
         else { // prop did not match an expected radius
-            ROS_WARN_STREAM(TAG << "Calculated radius does not match expected " << prop_angles_msg_.prop_label << " radius");
+            ROS_WARN_STREAM(TAG << "Calculated radius does not match expected " << prop_angles_msg_.prop_label << " radius, calculated radius = " << radius);
             return false;
         }
     }
