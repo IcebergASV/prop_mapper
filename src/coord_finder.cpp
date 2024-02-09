@@ -54,7 +54,7 @@ private:
 
     bool isValidLabel(std::string label)
     {
-        std::vector<std::string> prop_labels = {"red_marker", "green_marker"}; // TODO update with all props
+        std::vector<std::string> prop_labels = {"red_marker", "green_marker", "red_buoy", "green_buoy", "yellow_buoy", "blue_buoy", "black_buoy"}; // TODO update with all props
         auto it = std::find(prop_labels.begin(), prop_labels.end(), label);
 
         return it != prop_labels.end();
