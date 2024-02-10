@@ -142,34 +142,36 @@ private:
     }
 
     bool validateRadius(std::string &prop_label, double radius) {
-        if ((prop_label == "red_marker" || prop_label == "green_marker") && (radius>marker_radius_p-marker_radius_range_p && radius<marker_radius_p+marker_radius_range_p)) {
-            return true;
-        }
-        else if ((prop_label == "blue_buoy") && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
-            return true;
-        }
-        else if ((prop_label == "black_buoy") && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
-            return true;
-        }
-        else if ((prop_label == "red_buoy" || prop_label == "green_buoy" || prop_label == "yellow_buoy")) {
-            if(!check_small_buoys_p && ((radius>(((buoy_radius_sm_p+buoy_radius_lg_p)/2)-buoy_lg_radius_range_p)) && (radius<(((buoy_radius_sm_p+buoy_radius_lg_p)/2)+buoy_lg_radius_range_p)))) {
-                return true;
-            }
-            else if (check_small_buoys_p && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
-                ROS_DEBUG_STREAM(TAG << "Label updated, old: " << prop_label << "; new: " << prop_label << "_lg");
-                prop_label.append("_lg");
-                return true;
-            }
-            else if (check_small_buoys_p && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
-                ROS_DEBUG_STREAM(TAG << "Label updated, old: " << prop_label << "; new: " << prop_label << "_sm");
-                prop_label.append("_sm");
-                return true;
-            }
-        }
-        else { // prop did not match an expected radius
-            ROS_WARN_STREAM(TAG << "Calculated radius does not match expected " << prop_angles_msg_.prop_label << " radius, calculated radius = " << radius);
-            return false;
-        }
+        //if ((prop_label == "red_marker" || prop_label == "green_marker") && (radius>marker_radius_p-marker_radius_range_p && radius<marker_radius_p+marker_radius_range_p)) {
+        //    return true;
+        //}
+        //else if ((prop_label == "blue_buoy") && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
+        //    return true;
+        //}
+        //else if ((prop_label == "black_buoy") && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
+        //    return true;
+        //}
+        //else if ((prop_label == "red_buoy" || prop_label == "green_buoy" || prop_label == "yellow_buoy")) {
+        //    if(!check_small_buoys_p && ((radius>(((buoy_radius_sm_p+buoy_radius_lg_p)/2)-buoy_lg_radius_range_p)) && (radius<(((buoy_radius_sm_p+buoy_radius_lg_p)/2)+buoy_lg_radius_range_p)))) {
+        //        return true;
+        //    }
+        //    else if (check_small_buoys_p && (radius>buoy_radius_lg_p-buoy_lg_radius_range_p && radius<buoy_radius_lg_p+buoy_lg_radius_range_p)) {
+        //        ROS_DEBUG_STREAM(TAG << "Label updated, old: " << prop_label << "; new: " << prop_label << "_lg");
+        //        prop_label.append("_lg");
+        //        return true;
+        //    }
+        //    else if (check_small_buoys_p && (radius>buoy_radius_sm_p-buoy_sm_radius_range_p && radius<buoy_radius_sm_p+buoy_sm_radius_range_p)) {
+        //        ROS_DEBUG_STREAM(TAG << "Label updated, old: " << prop_label << "; new: " << prop_label << "_sm");
+        //        prop_label.append("_sm");
+        //        return true;
+        //    }
+        //}
+        //else { // prop did not match an expected radius
+        //    ROS_WARN_STREAM(TAG << "Calculated radius does not match expected " << prop_angles_msg_.prop_label << " radius, calculated radius = " << radius);
+        //    return false;
+        //}
+        //prop_label = "buoy";
+        return true;
     }
 
     /**
