@@ -22,6 +22,7 @@ check_small_buoys: true # boolean - are we checking for small buoys separate fro
 
 valid_prop_labels: ["red_marker", "green_marker", "yellow_buoy", "blue_buoy", "green_buoy", "red_buoy", "marker", "buoy"] # valid labels for props
 
+
 # prop map
 mapping_safety_radius: 5.0
 
