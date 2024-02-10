@@ -20,7 +20,8 @@ large_buoy_radius_range: 0.1 #meters - acceptable range for lg. buoy radius
 lidar_point_range: 0.3 #meters - how close points should be for radius checking
 check_small_buoys: true # boolean - are we checking for small buoys separate from large buoys
 
-valid_prop_labels: ["red_marker", "green_marker", "yellow_buoy", "blue_buoy", "green_buoy", "red_buoy", "black_buoy"] # valid labels for props
+valid_prop_labels: ["red_marker", "green_marker", "yellow_buoy", "blue_buoy", "green_buoy", "red_buoy", "marker", "buoy"] # valid labels for props
+
 
 # prop map
 mapping_safety_radius: 5.0

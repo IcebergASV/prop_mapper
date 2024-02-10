@@ -20,14 +20,14 @@ void mock_marker_angles() {
 
     while (ros::ok()) 
     {
-        msg.prop_label = "red_marker";
+        msg.prop_label = "marker";
         msg.theta_small = M_PI/2; 
         msg.theta_large = M_PI;
         pub.publish(msg);
         
         rate.sleep(); 
         
-        msg.prop_label = "green_marker";
+        msg.prop_label = "marker";
         msg.theta_small = 0.0; 
         msg.theta_large = M_PI/2;
         pub.publish(msg);
