@@ -3,8 +3,8 @@
   <!--Launch file for real life-->
 
   <!-- Arguments -->
-  <arg name="use_mock_angle_finder" default="true"/>
-  <arg name="record_rosbag" default="true"/>
+  <arg name="use_mock_angle_finder" default="false"/>
+  <arg name="record_rosbag" default="false"/>
 
   <!-- Nodes -->
 
