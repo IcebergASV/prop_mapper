@@ -5,6 +5,7 @@
   <!-- Arguments -->
   <arg name="use_mock_angle_finder" default="false"/>
   <arg name="record_rosbag" default="false"/>
+  <arg name="use_nav_channel_mock_angle_finder" default="false"/>
 
   <!-- Nodes -->
 
